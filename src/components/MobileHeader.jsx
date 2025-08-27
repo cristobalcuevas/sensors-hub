@@ -2,8 +2,6 @@ import React from 'react';
 import { Menu, Droplet } from 'lucide-react';
 
 export const MobileHeader = () => {
-    
-  // Al hacer clic, disparamos un evento global que el Sidebar escuchará
   const handleMenuClick = () => {
     const event = new Event('open-menu');
     document.dispatchEvent(event);
@@ -20,7 +18,7 @@ export const MobileHeader = () => {
       </button>
       <h1 className="text-xl font-bold text-sky-400 flex items-center">
         <Droplet className="mr-2" />
-        iaGlobal
+        SensorsHub
       </h1>
     </header>
   );

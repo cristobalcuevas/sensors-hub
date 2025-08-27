@@ -13,7 +13,7 @@ export const MapCard = React.memo(({ position, children }) => {
       <div className="bg-white shadow-lg rounded-xl p-6 text-center">
         <h3 className="text-lg font-semibold text-slate-600 flex items-center justify-center">
           <MapPin className="mr-2 h-5 w-5" />
-          Ubicación del Sensor
+          Ubicación del sensor
         </h3>
         <p className="text-slate-500 mt-2">No hay datos de ubicación disponibles.</p>
       </div>
@@ -41,7 +41,6 @@ export const MapCard = React.memo(({ position, children }) => {
           />
           <Marker position={position}>
             <Popup>
-              {/* 👇 2. Aquí renderizamos el contenido que nos pasen */}
               {children}
             </Popup>
           </Marker>

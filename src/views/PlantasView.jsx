@@ -25,7 +25,6 @@ export const UbidotsView = () => {
 
     return (
       <>
-        {/* Iterar sobre cada sensor para mostrar sus tarjetas */}
         {plantConfig.sensors.map(sensor => (
           <div key={sensor.id} className="mb-10">
             <h3 className="text-2xl font-semibold text-slate-700 mb-4 border-b-2 border-sky-200 pb-2">{sensor.name}</h3>
@@ -51,12 +50,11 @@ export const UbidotsView = () => {
               <p><strong>Planta: </strong> {plantConfig.name}</p>
               <p><strong>Presion: </strong>{formatValue(data.latestValues.pressure)} bar</p>
               <p><strong>Caudal: </strong> {formatValue(data.latestValues.flow)} L/min</p>
-            </div>  
+            </div>
           </MapCard>
         </div>
 
-        {/* Gráficos con el historial de todas las variables */}
-        <h3 className="text-2xl font-semibold text-slate-700 mb-4 mt-8 border-b-2 border-slate-300 pb-2">Gráficas Históricas (Últimas 24h)</h3>
+        <h3 className="text-2xl font-semibold text-slate-700 mb-4 mt-8 border-b-2 border-slate-300 pb-2">Gráficas históricas (Últimas 24h)</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {plantConfig.sensors.flatMap(sensor =>
             Object.entries(sensor.variables).map(([key, config]) => (
@@ -79,7 +77,7 @@ export const UbidotsView = () => {
   return (
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
-        <h2 className="text-3xl font-bold text-slate-800">Puntos de Medición</h2>
+        <h2 className="text-3xl font-bold text-slate-800">Puntos de medición</h2>
         <select
           id="plant-select"
           value={selectedPlant}

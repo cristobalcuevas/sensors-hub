@@ -44,7 +44,7 @@ export const Sidebar = () => {
         <div className="p-6 text-center border-b border-slate-700 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-sky-400 flex items-center">
             <Droplet className="mr-2" />
-            SensorHub
+            SensorsHub
           </h1>
           <button onClick={closeMenu} className="md:hidden text-slate-400 hover:text-white" aria-label="Cerrar menú">
             <X size={24} />

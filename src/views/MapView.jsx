@@ -5,7 +5,6 @@ import { useUbidotsData } from '../hooks/useUbidotsData';
 import { useAmbientWeatherData } from '../hooks/useAmbientWeatherData';
 import { CONSTANTS } from '../constants';
 
-// Funciones auxiliares que necesitaremos
 const formatValue = (value, decimals = 2) => {
   if (typeof value !== 'number' || isNaN(value)) return 'N/A';
   return value.toFixed(decimals);
@@ -88,9 +87,7 @@ export const GlobalMapView = () => {
   const mapCenter = [-39.309023, -71.980638];
 
   return (
-    // Contenedor que ocupa toda la pantalla
     <div className="w-full h-full">
-      {/* Componentes "fantasma" que obtienen los datos de Ubidots */}
       {CONSTANTS.UBIDOTS_PLANTS.map(plant => (
         <UbidotsDataFetcher key={plant.id} plant={plant} onDataLoaded={handleUbidotsData} />
       ))}

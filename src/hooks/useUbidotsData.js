@@ -28,7 +28,7 @@ export const useUbidotsData = (plantId) => {
         const end = Date.now();
         const start = end - 24 * 60 * 60 * 1000;
 
-        // --- 1. OBTENER ÚLTIMOS VALORES (Sin cambios) ---
+        // obtener ultimos valores
         let latestValuesPromises = [];
         plantConfig.sensors.forEach(sensor => {
           Object.keys(sensor.variables).forEach(key => {
@@ -50,9 +50,8 @@ export const useUbidotsData = (plantId) => {
           });
         });
 
-        // --- 2. OBTENER HISTORIAL ---
+        // obtener el historial
         let historyPromises = [];
-        // Guardaremos las claves en el mismo orden que los IDs para mapear la respuesta
         const sensorVariableKeys = [];
 
         plantConfig.sensors.forEach(sensor => {
@@ -85,10 +84,9 @@ export const useUbidotsData = (plantId) => {
 
         const historyResultsFromSensors = await Promise.all(historyPromises);
 
-        // --- 3. PROCESAR LA RESPUESTA ---
+        // procesar y unificar el historial
         const unifiedHistory = {};
         historyResultsFromSensors.forEach((sensorData, sensorIndex) => {
-          // ✨ CAMBIO 2: Leemos la estructura correcta: response.results[variableIndex]
           if (sensorData && Array.isArray(sensorData.results)) {
             sensorData.results.forEach((variableDataSet, variableIndex) => {
               const key = sensorVariableKeys[sensorIndex][variableIndex];
@@ -122,10 +120,7 @@ export const useUbidotsData = (plantId) => {
     };
 
     fetchData();
-    // 2. Establece un intervalo para que se vuelva a llamar cada X tiempo
-    const intervalId = setInterval(fetchData, 180000); // 180000 ms = 3 minutos
-
-    // 3. Limpia el intervalo cuando el componente se desmonta para evitar fugas de memoria
+    const intervalId = setInterval(fetchData, 180000);
     return () => clearInterval(intervalId);
   }, [plantId]);
 

@@ -10,14 +10,8 @@ export const useAmbientWeatherData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Si ya hay una petición en curso, no hacemos nada.
       if (isFetching.current) return;
-
-      // Marcamos que la petición va a comenzar.
       isFetching.current = true;
-
-      // Mantenemos el 'loading' solo en la primera carga.
-      // En las siguientes, los datos se refrescarán en segundo plano.
       if (!data.latest) {
         setLoading(true);
       }
@@ -31,7 +25,6 @@ export const useAmbientWeatherData = () => {
         isFetching.current = false;
         return;
       }
-
       try {
         const url = `https://api.ambientweather.net/v1/devices/${MAC_ADDRESS}?apiKey=${API_KEY}&applicationKey=${APPLICATION_KEY}&limit=288`;
         const response = await fetch(url);
@@ -77,7 +70,7 @@ export const useAmbientWeatherData = () => {
 
     return () => clearTimeout(timerId);
 
-  }, []); // El array vacío asegura que esto se configure solo una vez.
+  }, []);
 
   return { data, loading, error };
 };

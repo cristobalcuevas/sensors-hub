@@ -36,7 +36,7 @@ export const FirebaseView = () => {
       <div className="p-4 md:p-8 flex justify-center items-center h-full">
         <div className="text-center bg-white p-10 rounded-xl shadow-lg">
           <AlertTriangle className="mx-auto h-12 w-12 text-amber-500" />
-          <h2 className="mt-4 text-2xl font-semibold text-slate-700">No se encontraron datos de Firebase</h2>
+          <h2 className="mt-4 text-2xl font-semibold text-slate-700">No se encontraron datos</h2>
           <p className="text-slate-500 mt-2 max-w-md">
           </p>
         </div>
@@ -60,7 +60,6 @@ export const FirebaseView = () => {
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
-      {/* SECCIÓN DEL DASHBOARD */}
       <h2 className="text-3xl font-bold text-slate-800 mb-6">Maqueta</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
         {dashboardCards.map((card, index) => <DashboardCard key={index} {...card} />)}
@@ -78,8 +77,7 @@ export const FirebaseView = () => {
 
       </div>
 
-      {/* SECCIÓN DE GRÁFICOS */}
-      <h3 className="text-2xl font-semibold text-slate-700 mb-4 mt-8 border-b-2 border-slate-300 pb-2">Gráficas Históricas</h3>
+      <h3 className="text-2xl font-semibold text-slate-700 mb-4 mt-8 border-b-2 border-slate-300 pb-2">Gráficas históricas</h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {chartConfigs.map((config, index) => (
           <div key={config.dataKey} className={index === 2 ? "lg:col-span-2" : ""}>
@@ -90,7 +88,7 @@ export const FirebaseView = () => {
 
       <div className="text-md text-slate-600 flex items-center pt-5">
         <Clock className="mr-2 h-4 w-4" />
-        Última Actualización: {formatTimestamp(lastData.timestamp)}
+        Última actualización: {formatTimestamp(lastData.timestamp)}
       </div>
     </div>
   );

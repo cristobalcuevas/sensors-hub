@@ -1,6 +1,6 @@
 import { Gauge, Waves, Battery, CircuitBoard, Factory, Thermometer, ThermometerSun, CloudSun, Map } from 'lucide-react';
 
-const CONSTANTS = {
+export const CONSTANTS = {
   DEVICE_NAME: 'iaGlobal',
 
   COLORS: {
@@ -115,11 +115,9 @@ const CONSTANTS = {
   ]
 };
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { id: 'maqueta', label: 'Maqueta', icon: CircuitBoard },
   { id: 'plantas', label: 'Plantas', icon: Factory },
   { id: 'estacion', label: 'Estación met.', icon: CloudSun },
   { id: 'mapa', label: 'Mapa', icon: Map }
 ];
-
-export { CONSTANTS, NAV_ITEMS };
