@@ -1,0 +1,7 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { WeatherView } from '../views/WeatherView';
+---
+<MainLayout>
+    <WeatherView client:only="react" />
+</MainLayout>

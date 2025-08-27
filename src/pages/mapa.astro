@@ -1,0 +1,8 @@
+---
+// src/pages/mapa.astro
+import MainLayout from '../layouts/MainLayout.astro';
+import { GlobalMapView } from '../views/GlobalMapView';
+---
+<MainLayout>
+    <GlobalMapView client:only="react" />
+</MainLayout>

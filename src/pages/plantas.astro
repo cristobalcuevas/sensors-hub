@@ -1,0 +1,8 @@
+---
+// src/pages/ubidots.astro
+import MainLayout from '../layouts/MainLayout.astro';
+import { UbidotsView } from '../views/UbidotsView';
+---
+<MainLayout>
+    <UbidotsView client:only="react" />
+</MainLayout>
