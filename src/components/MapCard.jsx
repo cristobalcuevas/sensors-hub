@@ -4,9 +4,9 @@ import L from 'leaflet';
 import { MapPin } from 'lucide-react';
 
 const iconPerson = L.divIcon({
-  className: 'pulse',   // nuestra clase CSS
-  iconSize: [20, 20],   // tamaño del div
-  html: ''              // el contenido interno (puede ser vacío o un ícono con fontawesome, etc.)
+  className: 'pulse',
+  iconSize: [20, 20],
+  html: ''
 });
 
 export const MapCard = React.memo(({ position, children }) => {

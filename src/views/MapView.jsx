@@ -22,9 +22,9 @@ const UbidotsDataFetcher = ({ plant, onDataLoaded }) => {
 };
 
 const iconPerson = L.divIcon({
-  className: '.pulse .animate-ping',   // nuestra clase CSS
-  iconSize: [20, 20],   // tamaño del div
-  html: ''              // el contenido interno (puede ser vacío o un ícono con fontawesome, etc.)
+  className: 'pulse',
+  iconSize: [20, 20],
+  html: ''
 });
 
 export const GlobalMapView = () => {
