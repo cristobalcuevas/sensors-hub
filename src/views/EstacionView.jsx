@@ -4,6 +4,7 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 import { DashboardCard } from '../components/DashboardCard';
 import { MapCard } from '../components/MapCard';
 import { ChartCard } from '../components/ChartCard';
+import { DateRangeFilter } from '../components/DateRangeFilter';
 import { CONSTANTS } from '../constants';
 import { Thermometer, ThermometerSun, Gauge, CloudRain, Wind, Compass, Clock } from 'lucide-react';
 
@@ -18,7 +19,9 @@ export const WeatherView = () => {
   const renderContent = () => {
     if (loading) return <LoadingState />;
     if (error) return <ErrorBoundary error={error} />;
-    if (!data.latest) return <ErrorBoundary error="No se encontraron datos recientes de la estación." />;
+    if (!data || !data.latest) {
+      return <ErrorBoundary error="No se pudieron cargar los datos más recientes de la estación." />;
+    }
 
     const { latest, history } = data;
 

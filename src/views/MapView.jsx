@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
 import { useFirebaseData } from '../hooks/useFirebaseData';
 import { useUbidotsData } from '../hooks/useUbidotsData';
 import { useAmbientWeatherData } from '../hooks/useAmbientWeatherData';
@@ -19,6 +20,12 @@ const UbidotsDataFetcher = ({ plant, onDataLoaded }) => {
   }, [data, plant.id, onDataLoaded]);
   return null;
 };
+
+const iconPerson = L.divIcon({
+  className: '.pulse .animate-ping',   // nuestra clase CSS
+  iconSize: [20, 20],   // tamaño del div
+  html: ''              // el contenido interno (puede ser vacío o un ícono con fontawesome, etc.)
+});
 
 export const GlobalMapView = () => {
   const [markers, setMarkers] = useState([]);
@@ -99,7 +106,7 @@ export const GlobalMapView = () => {
         />
 
         {markers.map((marker, index) => (
-          <Marker key={index} position={marker.position}>
+          <Marker key={index} position={marker.position} icon={iconPerson}>
             <Popup>{marker.popupContent}</Popup>
           </Marker>
         ))}

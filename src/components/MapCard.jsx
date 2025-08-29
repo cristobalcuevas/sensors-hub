@@ -1,6 +1,13 @@
 import React, { useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
 import { MapPin } from 'lucide-react';
+
+const iconPerson = L.divIcon({
+  className: 'pulse',   // nuestra clase CSS
+  iconSize: [20, 20],   // tamaño del div
+  html: ''              // el contenido interno (puede ser vacío o un ícono con fontawesome, etc.)
+});
 
 export const MapCard = React.memo(({ position, children }) => {
   const isValidPosition = useMemo(() =>
@@ -39,7 +46,7 @@ export const MapCard = React.memo(({ position, children }) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             className="filter grayscale"
           />
-          <Marker position={position}>
+          <Marker position={position} icon={iconPerson}>
             <Popup>
               {children}
             </Popup>

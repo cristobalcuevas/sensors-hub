@@ -5,6 +5,7 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 import { DashboardCard } from '../components/DashboardCard';
 import { MapCard } from '../components/MapCard';
 import { ChartCard } from '../components/ChartCard';
+import { DateRangeFilter } from '../components/DateRangeFilter'; // 👈 Importar el filtro
 import { CONSTANTS } from '../constants';
 
 const formatValue = (value, decimals = 2) => {
@@ -89,6 +90,7 @@ export const UbidotsView = () => {
           ))}
         </select>
       </div>
+      <DateRangeFilter />
 
       {renderContent()}
     </div>
