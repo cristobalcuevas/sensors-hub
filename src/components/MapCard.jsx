@@ -28,9 +28,9 @@ export const MapCard = React.memo(({ position, children }) => {
   }
 
   return (
-    <div className="bg-white shadow-lg rounded-xl p-4">
+    <div className="bg-white shadow-sm rounded-xl p-4 md:p-6">
       <h3 className="font-semibold text-slate-700 mb-4 px-2 flex items-center">
-        <MapPin className="mr-2 h-5 w-5" />
+        <MapPin className="mr-2 h-5 w-5" aria-hidden="true" />
         Ubicación
       </h3>
       <div className="h-80 w-full rounded-lg overflow-hidden">

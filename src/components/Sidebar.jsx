@@ -43,7 +43,7 @@ export const Sidebar = () => {
       >
         <div className="p-6 text-center border-b border-slate-700 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-sky-400 flex items-center">
-            <Droplet className="mr-2" />
+            <Droplet className="mr-2" aria-hidden="true" />
             SensorsHub
           </h1>
           <button onClick={closeMenu} className="md:hidden text-slate-400 hover:text-white" aria-label="Cerrar menú">
@@ -65,7 +65,7 @@ export const Sidebar = () => {
                     : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                   }`}
               >
-                <item.icon className="mr-3 h-5 w-5" />
+                <item.icon className="mr-3 h-5 w-5" aria-hidden="true" />
                 <span className="font-medium">{item.label}</span>
               </a>
             );

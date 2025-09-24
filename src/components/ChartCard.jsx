@@ -1,72 +1,129 @@
 import React from 'react';
-import { LineChart, ReferenceLine, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+// Registrar los módulos necesarios
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend
+);
 
 const formatValue = (value, decimals = 2) => {
   if (typeof value !== 'number' || isNaN(value)) return 'N/A';
   return value.toFixed(decimals);
 };
 
-export const ChartCard = React.memo(({ data, dataKey, name, unit, threshold, color }) => (
-  <div className="bg-white shadow-lg rounded-xl p-4 md:p-6">
-    <h3 className="font-semibold text-slate-700 mb-4">{`${name} (${unit})`}</h3>
-    <div
-      tabIndex={0}
-      role="figure"
-      aria-label={`Gráfico de ${name} en ${unit}`}
-      className="focus:outline-none focus:ring-2 focus:ring-sky-500 rounded"
-    >
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart
-          data={data}
-          margin={{ top: 5, right: 30, left: 25, bottom: 20 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-          <XAxis
-            label={{ value: 'Time', offset: 30, fill: '#64748b', fontSize: 12 }}
-            dataKey="time"
-            stroke="#94a3b8"
-            fontSize={12}
-            tick={{ fontSize: 12 }}
-          />
-          <YAxis
-            label={{ value: `${name} (${unit})`, angle: -90, position: 'center', offset: -5, fill: '#64748b', fontSize: 12 }}
-            domain={['auto', 'auto']}
-            stroke="#94a3b8"
-            fontSize={12}
-            tickFormatter={(value) => formatValue(value)}
-            tick={{ fontSize: 12 }}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(5px)',
-              border: '1px solid #e0e0e0',
-              borderRadius: '0.75rem',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-            }}
-            formatter={(value, name, props) => [formatValue(value), props.payload.name]}
-            labelStyle={{ color: '#475569' }}
-          />
-          {threshold && (
-            <ReferenceLine
-              y={threshold}
-              label={{ value: "Límite", position: "topRight" }}
-              stroke="#ef4444"
-              strokeDasharray="5 5"
-            />
-          )}
-          <Line
-            type="monotone"
-            dataKey={dataKey}
-            name={name}
-            stroke={color}
-            strokeWidth={2}
-            dot={false}
-            activeDot={{ r: 6, strokeWidth: 2, fill: color }}
-            connectNulls={true}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+export const ChartCard = React.memo(({ data, dataKey, name, unit, threshold, color }) => {
+  // Extraer etiquetas y valores del array de datos
+  const labels = data.map((d) => d.time);
+  const values = data.map((d) => d[dataKey]);
+
+  // Dataset principal
+  const datasets = [
+    {
+      label: `${name} (${unit})`,
+      data: values,
+      borderColor: color,
+      backgroundColor: color,
+      tension: 0.3, // similar a "monotone" en Recharts
+      borderWidth: 2,
+      pointRadius: 0,
+      pointHoverRadius: 6,
+      pointHoverBorderWidth: 2,
+    },
+  ];
+
+  // Si hay un threshold, lo agregamos como dataset extra
+  if (threshold !== undefined) {
+    datasets.push({
+      label: 'Límite',
+      data: new Array(values.length).fill(threshold),
+      borderColor: '#ef4444',
+      borderDash: [5, 5],
+      pointRadius: 0,
+      borderWidth: 2,
+    });
+  }
+
+  const chartData = {
+    labels,
+    datasets,
+  };
+
+  const options = {
+    responsive: true,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (context) => `${formatValue(context.parsed.y)} ${unit}`,
+        },
+      },
+      legend: {
+        display: false,
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Tiempo',
+          color: '#64748b',
+          font: { size: 12 },
+        },
+        ticks: {
+          font: { size: 12 },
+          color: '#94a3b8',
+        },
+        grid: {
+          color: '#e0e0e0',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: `${name} (${unit})`,
+          color: '#64748b',
+          font: { size: 12 },
+        },
+        ticks: {
+          callback: (value) => formatValue(value),
+          font: { size: 12 },
+          color: '#94a3b8',
+        },
+        grid: {
+          color: '#e0e0e0',
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="bg-white shadow-sm rounded-xl p-4 md:p-6">
+      <h3 className="font-semibold text-slate-700 mb-4">{`${name} (${unit})`}</h3>
+      <div
+        tabIndex={0}
+        role="figure"
+        aria-label={`Gráfico de ${name} en ${unit}`}
+        className="focus:outline-none focus:ring-2 focus:ring-sky-500 rounded"
+      >
+        <Line data={chartData} options={options} />
+      </div>
     </div>
-  </div>
-));
+  );
+});

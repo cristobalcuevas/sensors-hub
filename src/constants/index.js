@@ -10,6 +10,7 @@ export const CONSTANTS = {
     rose: '#f43f5e',
     violet: '#8b5cf6',
     orange: '#f97316',
+    blue: '#3b82f6',
   },
 
   MAQUETA: {
@@ -111,7 +112,55 @@ export const CONSTANTS = {
           }
         }
       ]
-    }
+    },
+    {
+      id: 'punto_candelaria',
+      name: 'Punto Candelaria',
+      location: [-39.324540, -72.003677],
+      sensors: [
+        {
+          id: 'punto_candelaria_presion',
+          name: 'in0',
+          token: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CANDELARIA_TOKEN_PRESION,
+          variables: {
+            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CANDELARIA_PRESION, name: 'Presión', unit: 'bar', icon: Gauge, color: 'sky' },
+          }
+        }
+      ]
+
+    },
+    {
+      id: 'punto_curiche',
+      name: 'Punto Curiche',
+      location: [-39.324540, -72.003677],
+      sensors: [
+        {
+          id: 'punto_candelaria_presion',
+          name: 'in0',
+          token: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CURICHE_TOKEN_PRESION,
+          variables: {
+            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CURICHE_PRESION, name: 'Presión', unit: 'bar', icon: Gauge, color: 'sky' },
+          }
+        }
+      ]
+
+    },
+    {
+      id: 'punto_krauss',
+      name: 'Punto Krauss',
+      location: [-39.324540, -72.003677],
+      sensors: [
+        {
+          id: 'punto_candelaria_presion',
+          name: 'in0',
+          token: import.meta.env.PUBLIC_UBIDOTS_PUNTO_KRAUSS_TOKEN_PRESION,
+          variables: {
+            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_KRAUSS_PRESION, name: 'Presión', unit: 'bar', icon: Gauge, color: 'sky' },
+          }
+        }
+      ]
+
+    },
   ]
 };
 

@@ -14,16 +14,11 @@ const formatTimestamp = (timestamp) => {
   });
 };
 
-const calculateActivity = (elapsedTimeUs) => {
-  if (!elapsedTimeUs) return '0.00';
-  return (elapsedTimeUs / 60000000).toFixed(2);
-};
+const calculateActivity = (elapsedTimeUs) =>
+  elapsedTimeUs ? (elapsedTimeUs / 60000000).toFixed(2) : '0.00';
 
-const formatValue = (value, decimals = 2) => {
-  if (typeof value !== 'number' || isNaN(value)) return 'N/A';
-  return value.toFixed(decimals);
-};
-
+const formatValue = (value, decimals = 2) =>
+  typeof value === 'number' && !isNaN(value) ? value.toFixed(decimals) : 'N/A';
 
 export const FirebaseView = () => {
   const { lastData, history, loading, error } = useFirebaseData();
@@ -60,12 +55,21 @@ export const FirebaseView = () => {
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
+      {/* Header */}
       <h2 className="text-3xl font-bold text-slate-800 mb-6">Maqueta</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
-        {dashboardCards.map((card, index) => <DashboardCard key={index} {...card} />)}
-      </div>
-      <div className="grid grid-cols-1 gap-6 mb-8">
 
+      {/* Tarjetas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+        {dashboardCards.map(card =>
+          <DashboardCard
+            key={card.title}
+            {...card}
+          />
+        )}
+      </div>
+
+      {/* Mapa */}
+      <div className="grid grid-cols-1 gap-6 mb-8">
         <MapCard position={CONSTANTS.MAQUETA.LOCATION}>
           <div className="text-sm">
             <p><strong>Dispositivo:</strong> {lastData.device}</p>
@@ -74,18 +78,22 @@ export const FirebaseView = () => {
             <p><strong>Última actualización:</strong> {formatTimestamp(lastData.timestamp)}</p>
           </div>
         </MapCard>
-
       </div>
 
-      <h3 className="text-2xl font-semibold text-slate-700 mb-4 mt-8 border-b-2 border-slate-300 pb-2">Gráficas históricas</h3>
+      {/* Gráficas */}
+      <h3 className="text-2xl font-semibold text-slate-700 mb-4 mt-8 border-b-2 border-slate-300 pb-2">Gráficas históricas (Últimas 24h)</h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {chartConfigs.map((config, index) => (
           <div key={config.dataKey} className={index === 2 ? "lg:col-span-2" : ""}>
-            <ChartCard data={history} {...config} />
+            <ChartCard
+              data={history}
+              {...config}
+            />
           </div>
         ))}
       </div>
 
+      {/* Última actualización */}
       <div className="text-md text-slate-600 flex items-center pt-5">
         <Clock className="mr-2 h-4 w-4" />
         Última actualización: {formatTimestamp(lastData.timestamp)}

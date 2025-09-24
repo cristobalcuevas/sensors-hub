@@ -1,270 +1,167 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useDateStore } from '../store/dateStore';
-import { CONSTANTS } from '../constants';
+import { useState, useEffect, useCallback } from 'react';
 
-// Configuración de caché y timeouts
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
-const REQUEST_TIMEOUT = 30000; // 30 segundos
-const REFETCH_INTERVAL = 180000; // 3 minutos
+// Configuración por defecto
+const DEFAULT_CONFIG = {
+  refreshInterval: 180000, // 3 minutos
+  historyHours: 24,
+  pageSize: 1,
+  baseUrl: 'https://industrial.api.ubidots.com/api/v1.6'
+};
 
-// Cache global para evitar requests duplicados
-const requestCache = new Map();
-
-export const useUbidotsData = (plantId) => {
+export const useUbidotsData = (plantConfig, options = {}) => {
   const [data, setData] = useState({ latestValues: {}, history: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  const { startDate, endDate } = useDateStore();
-  const abortControllerRef = useRef(null);
-  const intervalRef = useRef(null);
 
-  // Memoizar configuración de planta para evitar búsquedas repetidas
-  const plantConfig = useMemo(() => {
-    return CONSTANTS.UBIDOTS_PLANTS.find(p => p.id === plantId);
-  }, [plantId]);
+  const config = { ...DEFAULT_CONFIG, ...options };
 
-  // Función para crear requests con timeout y abort controller
-  const createFetchWithTimeout = useCallback((url, options = {}) => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-    
-    return fetch(url, {
-      ...options,
-      signal: controller.signal,
-    }).finally(() => {
-      clearTimeout(timeoutId);
-    });
+  // Función para crear headers de autenticación
+  const createHeaders = useCallback((token, isPost = false) => {
+    const headers = { 'X-Auth-Token': token };
+    if (isPost) headers['Content-Type'] = 'application/json';
+    return headers;
   }, []);
 
-  // Función optimizada para obtener últimos valores
+  // Función para obtener los últimos valores
   const fetchLatestValues = useCallback(async (sensors) => {
-    const cacheKey = `latest_${plantId}`;
-    const cached = requestCache.get(cacheKey);
-    
-    // Verificar cache
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-      return cached.data;
-    }
-
     const promises = [];
     const variableKeys = [];
 
     sensors.forEach(sensor => {
       Object.entries(sensor.variables).forEach(([key, variable]) => {
-        variableKeys.push(key);
         promises.push(
-          createFetchWithTimeout(
-            `https://industrial.api.ubidots.com/api/v1.6/variables/${variable.id}/values/?page_size=1`,
-            { headers: { 'X-Auth-Token': sensor.token } }
-          ).then(res => {
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return res.json();
-          })
+          fetch(`${config.baseUrl}/variables/${variable.id}/values/?page_size=${config.pageSize}`, {
+            headers: createHeaders(sensor.token)
+          }).then(res => res.json())
         );
+        variableKeys.push(key);
       });
     });
 
-    const results = await Promise.allSettled(promises);
+    const results = await Promise.all(promises);
     const latestValues = {};
 
     results.forEach((result, index) => {
       const key = variableKeys[index];
-      if (result.status === 'fulfilled') {
-        latestValues[key] = result.value?.results?.[0]?.value ?? 'N/A';
-      } else {
-        console.warn(`Error fetching latest value for ${key}:`, result.reason);
-        latestValues[key] = 'Error';
-      }
-    });
-
-    // Guardar en cache
-    requestCache.set(cacheKey, {
-      data: latestValues,
-      timestamp: Date.now()
+      latestValues[key] = result?.results?.[0]?.value ?? 'N/A';
     });
 
     return latestValues;
-  }, [plantId, createFetchWithTimeout]);
+  }, [config.baseUrl, config.pageSize, createHeaders]);
 
-  // Función optimizada para obtener historial
-  const fetchHistory = useCallback(async (sensors, start, end) => {
-    const cacheKey = `history_${plantId}_${start}_${end}`;
-    const cached = requestCache.get(cacheKey);
-    
-    // Verificar cache
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-      return cached.data;
-    }
+  // Función para obtener el historial
+  const fetchHistory = useCallback(async (sensors) => {
+    const end = Date.now();
+    const start = end - (config.historyHours * 60 * 60 * 1000);
 
-    const promises = [];
-    const sensorVariableKeys = [];
+    const promises = sensors.map(sensor => {
+      const variableIds = Object.values(sensor.variables).map(v => v.id);
 
-    sensors.forEach(sensor => {
-      const variableIds = [];
-      const keys = [];
-      
-      Object.entries(sensor.variables).forEach(([key, config]) => {
-        variableIds.push(config.id);
-        keys.push(key);
-      });
-      
-      sensorVariableKeys.push(keys);
+      if (variableIds.length === 0) return Promise.resolve(null);
 
-      if (variableIds.length > 0) {
-        const body = {
-          variables: variableIds,
-          columns: ["value.value", "timestamp"],
-          join_dataframes: false,
-          start,
-          end,
-        };
+      const body = {
+        variables: variableIds,
+        columns: ["value.value", "timestamp"],
+        join_dataframes: false,
+        start,
+        end,
+      };
 
-        promises.push(
-          createFetchWithTimeout('https://industrial.api.ubidots.com/api/v1.6/data/raw/series', {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json', 
-              'X-Auth-Token': sensor.token 
-            },
-            body: JSON.stringify(body),
-          }).then(res => {
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return res.json();
-          })
-        );
-      }
+      return fetch(`${config.baseUrl}/data/raw/series`, {
+        method: 'POST',
+        headers: createHeaders(sensor.token, true),
+        body: JSON.stringify(body),
+      }).then(res => res.json());
     });
 
-    const results = await Promise.allSettled(promises);
-    const unifiedHistory = new Map(); // Usar Map para mejor rendimiento
+    const results = await Promise.all(promises);
+    return processHistoryData(results, sensors);
+  }, [config.baseUrl, config.historyHours, createHeaders]);
 
-    results.forEach((result, sensorIndex) => {
-      if (result.status === 'fulfilled' && result.value?.results) {
-        result.value.results.forEach((variableDataSet, variableIndex) => {
-          const key = sensorVariableKeys[sensorIndex]?.[variableIndex];
-          
-          if (key && Array.isArray(variableDataSet)) {
-            variableDataSet.forEach(([value, timestamp]) => {
-              if (timestamp != null && value != null) {
-                if (!unifiedHistory.has(timestamp)) {
-                  unifiedHistory.set(timestamp, {
-                    timestamp,
-                    time: new Date(timestamp).toLocaleTimeString('es-ES', { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    }),
-                  });
-                }
-                unifiedHistory.get(timestamp)[key] = value;
-              }
-            });
+  // Función para procesar datos del historial
+  const processHistoryData = useCallback((results, sensors) => {
+    const unifiedHistory = {};
+
+    results.forEach((sensorData, sensorIndex) => {
+      if (!sensorData?.results || !Array.isArray(sensorData.results)) return;
+
+      const sensor = sensors[sensorIndex];
+      const variableKeys = Object.keys(sensor.variables);
+
+      sensorData.results.forEach((variableData, variableIndex) => {
+        const key = variableKeys[variableIndex];
+        if (!key || !Array.isArray(variableData)) return;
+
+        variableData.forEach(([value, timestamp]) => {
+          if (timestamp == null || value == null) return;
+
+          if (!unifiedHistory[timestamp]) {
+            unifiedHistory[timestamp] = {
+              timestamp,
+              time: new Date(timestamp).toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit'
+              }),
+            };
           }
+
+          const numericValue = Number(value);
+          unifiedHistory[timestamp][key] = isNaN(numericValue) ? value : numericValue;
         });
-      } else if (result.status === 'rejected') {
-        console.warn(`Error fetching history for sensor ${sensorIndex}:`, result.reason);
-      }
+      });
     });
 
-    const history = Array.from(unifiedHistory.values())
-      .sort((a, b) => a.timestamp - b.timestamp);
+    return Object.values(unifiedHistory).sort((a, b) => a.timestamp - b.timestamp);
+  }, []);
 
-    // Guardar en cache
-    requestCache.set(cacheKey, {
-      data: history,
-      timestamp: Date.now()
-    });
-
-    return history;
-  }, [plantId, createFetchWithTimeout]);
-
-  // Función principal de fetch optimizada
+  // Función principal para obtener todos los datos
   const fetchData = useCallback(async () => {
-    if (!plantConfig?.sensors) {
-      setError("Configuración de planta o sensores no encontrada.");
+    if (!plantConfig?.sensors || plantConfig.sensors.length === 0) {
+      setError("Configuración de sensores no válida");
       setLoading(false);
       return;
     }
 
-    // Cancelar request anterior si existe
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    abortControllerRef.current = new AbortController();
-
-    // Solo mostrar loading si no hay datos previos
-    setLoading(prev => data.history.length === 0 ? true : prev);
+    setLoading(true);
     setError(null);
 
     try {
-      const start = startDate.getTime();
-      const end = endDate.getTime();
-
-      // Ejecutar ambas operaciones en paralelo
       const [latestValues, history] = await Promise.all([
         fetchLatestValues(plantConfig.sensors),
-        fetchHistory(plantConfig.sensors, start, end)
+        fetchHistory(plantConfig.sensors)
       ]);
 
-      // Verificar si el componente aún está montado
-      if (!abortControllerRef.current?.signal.aborted) {
-        setData({ latestValues, history });
-      }
-
+      setData({ latestValues, history });
     } catch (err) {
-      if (err.name !== 'AbortError' && !abortControllerRef.current?.signal.aborted) {
-        const errorMessage = err.message.includes('HTTP') 
-          ? 'Error de conexión con el servidor MCI'
-          : 'Error al obtener datos de MCI: ' + err.message;
-        
-        setError(errorMessage);
-        console.error("MCI API error:", err);
-      }
+      const errorMessage = `Error al obtener datos de Ubidots: ${err.message}`;
+      setError(errorMessage);
+      console.error("Ubidots API error:", err);
     } finally {
-      if (!abortControllerRef.current?.signal.aborted) {
-        setLoading(false);
-      }
-    }
-  }, [plantConfig, startDate, endDate, fetchLatestValues, fetchHistory, data.history.length]);
-
-  // Effect principal optimizado
-  useEffect(() => {
-    if (!plantId || !plantConfig) {
       setLoading(false);
-      setError(plantId ? "Configuración de planta no encontrada." : null);
+    }
+  }, [plantConfig, fetchLatestValues, fetchHistory]);
+
+  // Effect para manejar la carga inicial y el polling
+  useEffect(() => {
+    if (!plantConfig) {
+      setData({ latestValues: {}, history: [] });
+      setLoading(false);
       return;
     }
 
     fetchData();
 
-    // Configurar intervalo de refresco
-    intervalRef.current = setInterval(fetchData, REFETCH_INTERVAL);
+    if (config.refreshInterval > 0) {
+      const intervalId = setInterval(fetchData, config.refreshInterval);
+      return () => clearInterval(intervalId);
+    }
+  }, [plantConfig, fetchData, config.refreshInterval]);
 
-    // Cleanup function
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        abortControllerRef.current = null;
-      }
+
+
+  return {
+    data,
+    loading,
+    error
     };
-  }, [plantId, plantConfig, fetchData]);
-
-  // Cleanup al desmontar
-  useEffect(() => {
-    return () => {
-      // Limpiar cache viejo periódicamente
-      const now = Date.now();
-      for (const [key, value] of requestCache.entries()) {
-        if (now - value.timestamp > CACHE_TTL * 2) {
-          requestCache.delete(key);
-        }
-      }
-    };
-  }, []);
-
-  return { data, loading, error, refetch: fetchData };
 };
