@@ -120,7 +120,6 @@ export const ChartCard = React.memo(({ data, dataKey, name, unit, threshold, col
         tabIndex={0}
         role="figure"
         aria-label={`Gráfico de ${name} en ${unit}`}
-        className="focus:outline-none focus:ring-2 focus:ring-sky-500 rounded"
       >
         <Line data={chartData} options={options} />
       </div>

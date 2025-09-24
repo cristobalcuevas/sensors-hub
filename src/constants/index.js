@@ -40,7 +40,7 @@ export const CONSTANTS = {
           name: 'iag002',
           token: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_TOKEN_PRESION,
           variables: {
-            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_PRESION, name: 'Presión', unit: 'bar', icon: Gauge, color: 'sky' },
+            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_PRESION, name: 'Presión', unit: 'mca', icon: Gauge, color: 'sky' },
             //battery: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_BATERIA, name: 'Bateria', unit: 'V', icon: Battery, color: 'green' },
             //current: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_CORRIENTE, name: 'Corriente', unit: 'mA', icon: Gauge, color: 'amber' },
           }
@@ -50,7 +50,7 @@ export const CONSTANTS = {
           name: 'pulsos-03',
           token: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_TOKEN_ENTRADA,
           variables: {
-            flow: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_CAUDAL_ENTRADA, name: 'Caudal', unit: 'L/min', icon: Waves, color: 'rose' },
+            flow: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_CAUDAL_ENTRADA, name: 'Caudal', unit: 'L/s', icon: Waves, color: 'rose' },
             temperature: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_TEMPERATURA_ENTRADA, name: 'Temperatura ambiente', unit: '°C', icon: Thermometer, color: 'violet' },
             humidity: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_HUMEDAD_ENTRADA, name: 'Humedad ambiente', unit: '%', icon: ThermometerSun, color: 'orange' },
             //battery: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_BATERIA_ENTRADA, name: 'Bateria', unit: '%', icon: ThermometerSun, color: 'orange' },
@@ -62,7 +62,7 @@ export const CONSTANTS = {
           name: 'pulsos-04',
           token: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_TOKEN_SALIDA,
           variables: {
-            flow_out: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_CAUDAL_SALIDA, name: 'Caudal', unit: 'L/min', icon: Waves, color: 'rose' },
+            flow_out: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_CAUDAL_SALIDA, name: 'Caudal', unit: 'L/s', icon: Waves, color: 'rose' },
             temperature_out: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_TEMPERATURA_SALIDA, name: 'Temperatura ambiente', unit: '°C', icon: Thermometer, color: 'violet' },
             humidity_out: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_HUMEDAD_SALIDA, name: 'Humedad ambiente', unit: '%', icon: ThermometerSun, color: 'orange' },
             //battery: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_BATERIA_SALIDA, name: 'Bateria', unit: '%', icon: ThermometerSun, color: 'orange' },
@@ -81,7 +81,7 @@ export const CONSTANTS = {
           name: 'iag001',
           token: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_TOKEN_PRESION,
           variables: {
-            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_PRESION, name: 'Presión', unit: 'bar', icon: Gauge, color: 'sky' },
+            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_PRESION, name: 'Presión', unit: 'mca', icon: Gauge, color: 'sky' },
             //battery: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_BATERIA, name: 'Bateria', unit: 'V', icon: Battery, color: 'green' },
             //current: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_CORRIENTE, name: 'Corriente', unit: 'mA', icon: Gauge, color: 'amber' },
           }
@@ -91,7 +91,7 @@ export const CONSTANTS = {
           name: 'pulsos-01',
           token: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_TOKEN_ENTRADA,
           variables: {
-            flow: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_CAUDAL_ENTRADA, name: 'Caudal', unit: 'L/min', icon: Waves, color: 'rose' },
+            flow: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_CAUDAL_ENTRADA, name: 'Caudal', unit: 'L/s', icon: Waves, color: 'rose' },
             temperature: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_TEMPERATURA_ENTRADA, name: 'Temperatura ambiente', unit: '°C', icon: Thermometer, color: 'violet' },
             humidity: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_HUMEDAD_ENTRADA, name: 'Humedad ambiente', unit: '%', icon: ThermometerSun, color: 'orange' },
             //battery: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_BATERIA_ENTRADA, name: 'Bateria', unit: '%', icon: ThermometerSun, color: 'orange' },
@@ -104,7 +104,7 @@ export const CONSTANTS = {
           name: 'pulsos-02',
           token: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_TOKEN_SALIDA,
           variables: {
-            flow_out: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_CAUDAL_SALIDA, name: 'Caudal', unit: 'L/min', icon: Waves, color: 'rose' },
+            flow_out: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_CAUDAL_SALIDA, name: 'Caudal', unit: 'L/s', icon: Waves, color: 'rose' },
             temperature_out: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_TEMPERATURA_SALIDA, name: 'Temperatura ambiente', unit: '°C', icon: Thermometer, color: 'violet' },
             humidity_out: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_HUMEDAD_SALIDA, name: 'Humedad ambiente', unit: '%', icon: ThermometerSun, color: 'orange' },
             //battery: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_BATERIA_SALIDA, name: 'Bateria', unit: '%', icon: ThermometerSun, color: 'orange' },
@@ -116,14 +116,14 @@ export const CONSTANTS = {
     {
       id: 'punto_candelaria',
       name: 'Punto Candelaria',
-      location: [-39.324540, -72.003677],
+      location: [-39.315434, -71.990403],
       sensors: [
         {
           id: 'punto_candelaria_presion',
           name: 'in0',
           token: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CANDELARIA_TOKEN_PRESION,
           variables: {
-            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CANDELARIA_PRESION, name: 'Presión', unit: 'bar', icon: Gauge, color: 'sky' },
+            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CANDELARIA_PRESION, name: 'Presión', unit: 'mA', icon: Gauge, color: 'sky' },
           }
         }
       ]
@@ -132,14 +132,14 @@ export const CONSTANTS = {
     {
       id: 'punto_curiche',
       name: 'Punto Curiche',
-      location: [-39.324540, -72.003677],
+      location: [-39.3015702, -71.9744949],
       sensors: [
         {
           id: 'punto_candelaria_presion',
           name: 'in0',
           token: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CURICHE_TOKEN_PRESION,
           variables: {
-            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CURICHE_PRESION, name: 'Presión', unit: 'bar', icon: Gauge, color: 'sky' },
+            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CURICHE_PRESION, name: 'Presión', unit: 'mA', icon: Gauge, color: 'sky' },
           }
         }
       ]
@@ -148,14 +148,14 @@ export const CONSTANTS = {
     {
       id: 'punto_krauss',
       name: 'Punto Krauss',
-      location: [-39.324540, -72.003677],
+      location: [-39.2965513,-72.0095145],
       sensors: [
         {
           id: 'punto_candelaria_presion',
           name: 'in0',
           token: import.meta.env.PUBLIC_UBIDOTS_PUNTO_KRAUSS_TOKEN_PRESION,
           variables: {
-            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_KRAUSS_PRESION, name: 'Presión', unit: 'bar', icon: Gauge, color: 'sky' },
+            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_KRAUSS_PRESION, name: 'Presión', unit: 'mA', icon: Gauge, color: 'sky' },
           }
         }
       ]
