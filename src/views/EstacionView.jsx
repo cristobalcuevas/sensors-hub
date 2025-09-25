@@ -33,7 +33,7 @@ export const WeatherView = () => {
     { icon: CloudRain, title: "Precipitación diarias", value: formatValue(latest.dailyrainmm, 1), unit: "mm", color: "text-blue-500", bgColor: "bg-blue-100" },
     { icon: Wind, title: "Velocidad del viento", value: formatValue(latest.windspeedkmh, 1), unit: "km/h", color: "text-green-500", bgColor: "bg-green-100" },
     { icon: Compass, title: "Dirección del viento", value: latest.winddir, unit: "°", color: "text-cyan-500", bgColor: "bg-cyan-100" },
-  ];
+  ]
 
   const chartConfigs = [
     { dataKey: "tempc", name: "Temperatura exterior", unit: "°C", color: CONSTANTS.COLORS.orange },

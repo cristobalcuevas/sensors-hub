@@ -7,6 +7,7 @@ const viewToPath = {
   maqueta: '/',
   plantas: '/plantas',
   estacion: '/estacion',
+  alarmas: '/alarmas',
   mapa: '/mapa',
 };
 
