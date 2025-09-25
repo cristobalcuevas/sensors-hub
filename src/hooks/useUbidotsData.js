@@ -149,7 +149,7 @@ export const useUbidotsData = (plantConfig, options = {}) => {
     
     const startTime = endTime - (config.historyHours * 60 * 60 * 1000);
 
-    const promises = sensors.map(sensor => {
+    const promises = sensors.map(async sensor => {
       const variableIds = Object.values(sensor.variables).map(v => v.id);
 
       if (variableIds.length === 0) return Promise.resolve(null);
@@ -162,11 +162,12 @@ export const useUbidotsData = (plantConfig, options = {}) => {
         end: endTime,
       };
 
-      return fetch(`${config.baseUrl}/data/raw/series`, {
+      const res = await fetch(`${config.baseUrl}/data/raw/series`, {
         method: 'POST',
         headers: createHeaders(sensor.token, true),
         body: JSON.stringify(body),
-      }).then(res => res.json());
+      });
+      return await res.json();
     });
 
     const results = await Promise.all(promises);
