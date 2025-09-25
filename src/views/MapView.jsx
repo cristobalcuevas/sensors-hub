@@ -6,13 +6,11 @@ import { useUbidotsData } from '../hooks/useUbidotsData';
 import { useAmbientWeatherData } from '../hooks/useAmbientWeatherData';
 import { CONSTANTS } from '../constants';
 
-const formatValue = (value, decimals = 2) => {
-  if (typeof value !== 'number' || isNaN(value)) return 'N/A';
-  return value.toFixed(decimals);
-};
+const formatValue = (value, decimals = 2) =>
+  typeof value === 'number' && !isNaN(value) ? value.toFixed(decimals) : 'N/A';
 
 const UbidotsDataFetcher = ({ plant, onDataLoaded }) => {
-  const { data } = useUbidotsData(plant.id);
+  const { data } = useUbidotsData(plant);
   useEffect(() => {
     if (data.latestValues && Object.keys(data.latestValues).length > 0) {
       onDataLoaded(plant.id, data.latestValues);
@@ -41,7 +39,6 @@ export const GlobalMapView = () => {
   useEffect(() => {
     const allMarkers = [];
 
-    // Marcador de Firebase
     if (firebaseData) {
       allMarkers.push({
         position: CONSTANTS.MAQUETA.LOCATION,
@@ -69,24 +66,27 @@ export const GlobalMapView = () => {
       });
     }
 
-    CONSTANTS.UBIDOTS_PLANTS.forEach(plant => {
-      const data = ubidotsData[plant.id];
-      if (data) {
-        allMarkers.push({
-          position: plant.location,
-          popupContent: (
-            <div className="text-sm">
-              <p className="font-bold text-green-600">{plant.name}</p>
-              <p><strong>Presión:</strong> {formatValue(data.pressure)} bar</p>
-              <p><strong>Caudal:</strong> {formatValue(data.flow)} L/min</p>
-              <p><strong>Temperatura:</strong> {formatValue(data.temperature)} %</p>
-              <p><strong>Humedad:</strong> {formatValue(data.humidity)} %</p>
+CONSTANTS.UBIDOTS_PLANTS.forEach(plant => {
+  const data = ubidotsData[plant.id] || {};
 
-            </div>
-          )
-        });
-      }
-    });
+  const variableElements = plant.sensors.flatMap(sensor =>
+    Object.entries(sensor.variables).map(([key, variable]) => (
+      <p key={key}>
+        <strong>{variable.name}:</strong> {formatValue(data[key])} {variable.unit}
+      </p>
+    ))
+  );
+
+  allMarkers.push({
+    position: plant.location,
+    popupContent: (
+      <div className="text-sm">
+        <p className="font-bold text-green-600">{plant.name}</p>
+        {variableElements}
+      </div>
+    )
+  });
+});
 
     setMarkers(allMarkers);
   }, [firebaseData, weatherData, ubidotsData]);
