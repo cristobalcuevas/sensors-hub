@@ -83,13 +83,11 @@ export const FirebaseView = () => {
       {/* Gráficas */}
       <h3 className="text-2xl font-semibold text-slate-700 mb-4 mt-8 border-b-2 border-slate-300 pb-2">Gráficas históricas (Últimas 24h)</h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {chartConfigs.map((config, index) => (
-          <div key={config.dataKey} className={index === 2 ? "lg:col-span-2" : ""}>
+        {chartConfigs.map(config => (
             <ChartCard
               data={history}
               {...config}
             />
-          </div>
         ))}
       </div>
 

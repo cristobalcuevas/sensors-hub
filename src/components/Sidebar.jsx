@@ -43,10 +43,10 @@ export const Sidebar = () => {
       >
         <div className="p-6 text-center border-b border-slate-700 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-sky-400 flex items-center">
-            <Droplet className="mr-2" aria-hidden="true" />
+            <Droplet className="mr-2" title="SensorsHub" aria-hidden="true" />
             SensorsHub
           </h1>
-          <button onClick={closeMenu} className="md:hidden text-slate-400 hover:text-white" aria-label="Cerrar menú">
+          <button onClick={closeMenu} className="cursor-pointer md:hidden text-slate-400 hover:text-white" role="button" title="Cerrar menu" aria-label="Cerrar menu">
             <X size={24} />
           </button>
         </div>

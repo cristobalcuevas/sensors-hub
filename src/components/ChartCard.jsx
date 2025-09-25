@@ -42,6 +42,7 @@ export const ChartCard = React.memo(({ data, dataKey, name, unit, threshold, col
       pointRadius: 0,
       pointHoverRadius: 6,
       pointHoverBorderWidth: 2,
+      spanGaps: true,
     },
   ];
 

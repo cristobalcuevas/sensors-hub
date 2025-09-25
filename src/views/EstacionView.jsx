@@ -7,6 +7,13 @@ import { ChartCard } from '../components/ChartCard';
 import { CONSTANTS } from '../constants';
 import { Thermometer, ThermometerSun, Gauge, CloudRain, Wind, Compass, Clock } from 'lucide-react';
 
+const formatTimestamp = (timestamp) => {
+  return new Date(timestamp).toLocaleString('es-ES', {
+    dateStyle: 'long',
+    timeStyle: 'medium'
+  });
+};
+
 const formatValue = (value, decimals = 2) =>
   typeof value === 'number' && !isNaN(value) ? value.toFixed(decimals) : 'N/A';
 
@@ -78,7 +85,7 @@ export const WeatherView = () => {
       {/* Última actualización */}
       <div className="text-md text-slate-600 flex items-center pt-5">
         <Clock className="mr-2 h-4 w-4" />
-        Última Actualización: {new Date(latest.date).toLocaleString('es-ES')}
+        Última Actualización: {formatTimestamp(latest.date)}
       </div>
     </div>
   );
