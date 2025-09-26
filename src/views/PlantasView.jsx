@@ -101,18 +101,28 @@ export const UbidotsView = () => {
             {sensor.name}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {Object.entries(sensor.variables || {}).map(([key, config]) => (
-              <DashboardCard
-                key={key}
-                icon={config.icon}
-                title={config.name}
-                value={formatValue(data.latestValues[key])}
-                unit={config.unit}
-                color={`text-${config.color}-500`}
-                bgColor={`bg-${config.color}-100`}
-                isStale={isDataStale} // Pasamos el estado para que la tarjeta pueda mostrar indicadores visuales
-              />
-            ))}
+            {Object.entries(sensor.variables || {}).map(([key, config]) => {
+              let rawValue = data.latestValues[key];
+              let value;
+              if (config.conversion === 'ma_a_mca') {
+                value =  (rawValue - 4) * 15.93;
+              }
+              else {
+                value = rawValue;
+              }
+              return (
+                <DashboardCard
+                  key={key}
+                  icon={config.icon}
+                  title={config.name}
+                  value={formatValue(value)}
+                  unit={config.unit}
+                  color={`text-${config.color}-500`}
+                  bgColor={`bg-${config.color}-100`}
+                  isStale={isDataStale} // Pasamos el estado para que la tarjeta pueda mostrar indicadores visuales
+                />
+              );
+            })}
           </div>
         </div>
       ))}
@@ -134,19 +144,43 @@ export const UbidotsView = () => {
       {/* Gráficas */}
       <h3 className="text-2xl font-semibold text-slate-700 mb-4 mt-8 border-b-2 border-slate-300 pb-2">Gráficas históricas (Últimas 24h disponibles)</h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {selectedPlant.sensors?.flatMap(sensor =>
-          Object.entries(sensor.variables || {}).map(([key, config]) => (
-            <ChartCard
-              key={`${sensor.id}-${key}`}
-              data={data.history}
-              dataKey={key}
-              name={`${config.name} - ${sensor.name}`}
-              unit={config.unit}
-              color={CONSTANTS.COLORS?.[config.color]}
-              isStale={isDataStale}
-            />
-          ))
-        )}
+{selectedPlant.sensors?.flatMap(sensor =>
+  Object.entries(sensor.variables || {}).map(([key, config]) => {
+    // Transformamos history según el tipo de conversión
+    const chartData = data.history.map(entry => {
+      let rawValue = parseFloat(entry[key]);
+      let value;
+
+      if (!isNaN(rawValue)) {
+        if (config.conversion === 'ma_a_mca') {
+          value = (rawValue - 4) * 15.93;
+        } else {
+          value = rawValue;
+        }
+      } else {
+        value = null; // para que el gráfico pinte hueco
+      }
+
+      return {
+        ...entry,
+        [key]: value
+      };
+    });
+
+    return (
+      <ChartCard
+        key={`${sensor.id}-${key}`}
+        data={chartData}   // 👈 ahora va con valores convertidos
+        dataKey={key}
+        name={`${config.name} - ${sensor.name}`}
+        unit={config.unit}
+        color={CONSTANTS.COLORS?.[config.color]}
+        isStale={isDataStale}
+      />
+    );
+  })
+)}
+
       </div>
 
       {/* Última actualización */}

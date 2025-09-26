@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const DashboardCard = React.memo(({ icon: Icon, title, value, unit, color, bgColor }) => {
+export const DashboardCard = React.memo(({ icon: Icon, title, value, conversion, unit, color, bgColor }) => {
   return (
     <div
       role="card"
