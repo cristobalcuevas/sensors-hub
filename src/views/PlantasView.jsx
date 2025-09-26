@@ -82,7 +82,7 @@ export const UbidotsView = () => {
           <h2 className="text-3xl font-bold text-slate-800">Puntos de medición</h2>
         </div>
 
-        {/* VERSIÓN 1: Dropdown Personalizado */}
+        {/* Dropdown Personalizado */}
         <div className="relative mt-4 md:mt-0" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -109,40 +109,132 @@ export const UbidotsView = () => {
           {/* Dropdown menu */}
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-full md:w-80 bg-white border border-slate-200 rounded-lg shadow-xl z-50 overflow-hidden">
-              <div className="py-1">
-                {CONSTANTS.UBIDOTS_PLANTS.map((plant, index) => (
-                  <button
-                    key={plant.id}
-                    onClick={() => handlePlantSelect(plant.id)}
-                    className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors duration-150 ${
-                      selectedPlantId === plant.id ? 'bg-sky-50 border-r-2 border-sky-500' : ''
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        <div className="flex flex-col">
-                          <span className={`text-sm font-medium ${
-                            selectedPlantId === plant.id ? 'text-sky-900' : 'text-slate-900'
-                          }`}>
-                            {plant.name}
-                          </span>
-                          <span className="text-xs text-slate-500">
-                            ID: {plant.id}
-                          </span>
-                        </div>
-                      </div>
-                      {selectedPlantId === plant.id && (
-                        <Check className="w-4 h-4 text-sky-500" />
+
+              {/* Lista organizada por tipo */}
+              <div className="py-1 max-h-64 overflow-y-auto">
+                {(() => {
+                  // Separar plantas y puntos (asumiendo que tienes un campo 'type' o similar)
+                  // Si no tienes un campo específico, puedes usar otra lógica como el nombre o ID
+                  const plantas = CONSTANTS.UBIDOTS_PLANTS.filter(item => 
+                    item.type === 'plant' || item.name?.toLowerCase().includes('planta') || 
+                    !item.name?.toLowerCase().includes('punto')
+                  );
+                  const puntos = CONSTANTS.UBIDOTS_PLANTS.filter(item => 
+                    item.type === 'point' || item.name?.toLowerCase().includes('punto')
+                  );
+
+                  return (
+                    <>
+                      {/* Sección de Plantas */}
+                      {plantas.length > 0 && (
+                        <>
+                          <div className="px-4 py-2 bg-slate-100 border-y border-slate-200">
+                            <h4 className="text-xs font-semibold text-slate-600 uppercase tracking-wide flex items-center">
+                              <Building2 className="w-3 h-3 mr-2" />
+                              Plantas ({plantas.length})
+                            </h4>
+                          </div>
+                          {plantas.map((plant, index) => (
+                            <button
+                              key={plant.id}
+                              onClick={() => handlePlantSelect(plant.id)}
+                              className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors duration-150 ${
+                                selectedPlantId === plant.id ? 'bg-sky-50 border-r-2 border-sky-500' : ''
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <div className="w-3 h-3 rounded-full flex-shrink-0 bg-green-500"></div>
+                                  <div className="flex flex-col min-w-0 flex-1">
+                                    <span className={`text-sm font-medium truncate ${
+                                      selectedPlantId === plant.id ? 'text-sky-900' : 'text-slate-900'
+                                    }`}>
+                                      {plant.name}
+                                    </span>
+                                    <div className="flex items-center space-x-2 mt-1">
+                                      <span className="text-xs text-slate-500">
+                                        ID: {plant.id}
+                                      </span>
+                                      {plant.sensors && (
+                                        <span className="text-xs text-slate-400">
+                                          • {plant.sensors.length} sensores
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                {selectedPlantId === plant.id && (
+                                  <Check className="w-4 h-4 text-sky-500 flex-shrink-0" />
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        </>
                       )}
-                    </div>
-                  </button>
-                ))}
+
+                      {/* Sección de Puntos */}
+                      {puntos.length > 0 && (
+                        <>
+                          <div className="px-4 py-2 bg-slate-100 border-y border-slate-200">
+                            <h4 className="text-xs font-semibold text-slate-600 uppercase tracking-wide flex items-center">
+                              <svg className="w-3 h-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              Puntos de Medición ({puntos.length})
+                            </h4>
+                          </div>
+                          {puntos.map((punto, index) => (
+                            <button
+                              key={punto.id}
+                              onClick={() => handlePlantSelect(punto.id)}
+                              className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors duration-150 ${
+                                selectedPlantId === punto.id ? 'bg-sky-50 border-r-2 border-sky-500' : ''
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <div className={"w-3 h-3 rounded-full flex-shrink-0 bg-green-500"}></div>
+                                  <div className="flex flex-col min-w-0 flex-1">
+                                    <span className={`text-sm font-medium truncate ${
+                                      selectedPlantId === punto.id ? 'text-sky-900' : 'text-slate-900'
+                                    }`}>
+                                      {punto.name}
+                                    </span>
+                                    <div className="flex items-center space-x-2 mt-1">
+                                      <span className="text-xs text-slate-500">
+                                        ID: {punto.id}
+                                      </span>
+                                      {punto.sensors && (
+                                        <span className="text-xs text-slate-400">
+                                          • {punto.sensors.length} sensores
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                {selectedPlantId === punto.id && (
+                                  <Check className="w-4 h-4 text-sky-500 flex-shrink-0" />
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        </>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+
+              {/* Footer del dropdown */}
+              <div className="px-4 py-2 bg-slate-50 border-t border-slate-200">
+                <p className="text-xs text-slate-500 text-center">
+                  Los datos se actualizan en tiempo real
+                </p>
               </div>
             </div>
           )}
         </div>
-
       </div>
 
       {/* Mensaje de alerta */}
