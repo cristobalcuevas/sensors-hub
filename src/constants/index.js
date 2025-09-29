@@ -37,7 +37,7 @@ export const CONSTANTS = {
       sensors: [
         {
           id: 'volcan_presion',
-          name: 'iag002',
+          name: 'Tuberia de entrada',
           token: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_TOKEN_PRESION,
           variables: {
             pressure: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_PRESION, name: 'Presión', unit: 'mca', icon: Gauge, color: 'sky' },
@@ -47,7 +47,7 @@ export const CONSTANTS = {
         },
         {
           id: 'volcan_caudal_entrada',
-          name: 'pulsos-03',
+          name: 'Tuberia de entrada',
           token: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_TOKEN_ENTRADA,
           variables: {
             flow: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_CAUDAL_ENTRADA, name: 'Caudal', unit: 'L/s', icon: Waves, color: 'rose' },
@@ -59,7 +59,7 @@ export const CONSTANTS = {
         },
         {
           id: 'volcan_caudal_salida',
-          name: 'pulsos-04',
+          name: 'Tuberia de salida',
           token: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_TOKEN_SALIDA,
           variables: {
             flow_out: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_CAUDAL_SALIDA, name: 'Caudal', unit: 'L/s', icon: Waves, color: 'rose' },
@@ -78,7 +78,7 @@ export const CONSTANTS = {
       sensors: [
         {
           id: 'candelaria_presion',
-          name: 'iag001',
+          name: 'Tuberia de entrada',
           token: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_TOKEN_PRESION,
           variables: {
             pressure: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_PRESION, name: 'Presión', unit: 'mca', icon: Gauge, color: 'sky' },
@@ -88,7 +88,7 @@ export const CONSTANTS = {
         },
         {
           id: 'candelaria_caudal_entrada',
-          name: 'pulsos-01',
+          name: 'Tuberia de entrada',
           token: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_TOKEN_ENTRADA,
           variables: {
             flow: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_CAUDAL_ENTRADA, name: 'Caudal', unit: 'L/s', icon: Waves, color: 'rose' },
@@ -101,7 +101,7 @@ export const CONSTANTS = {
         },
         {
           id: 'candelaria_caudal_salida',
-          name: 'pulsos-02',
+          name: 'Tuberia de salida',
           token: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_TOKEN_SALIDA,
           variables: {
             flow_out: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_CAUDAL_SALIDA, name: 'Caudal', unit: 'L/s', icon: Waves, color: 'rose' },

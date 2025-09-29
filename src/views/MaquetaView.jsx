@@ -43,8 +43,8 @@ export const FirebaseView = () => {
     { icon: Gauge, title: "Presión", value: formatValue(lastData.pressure), unit: "bar", color: "text-sky-500", bgColor: "bg-sky-100" },
     { icon: Waves, title: "Caudal", value: formatValue(lastData.flow), unit: "L/min", color: "text-green-500", bgColor: "bg-green-100" },
     { icon: Wifi, title: "Señal (RSSI)", value: lastData.rssi, unit: "dBm", color: "text-rose-500", bgColor: "bg-rose-100" },
-    { icon: Battery, title: "Voltaje", value: "5.00", unit: "V", color: "text-violet-500", bgColor: "bg-violet-100" },
-    { icon: Activity, title: "Activo", value: calculateActivity(lastData.elapsed_time_us), unit: "min", color: "text-orange-500", bgColor: "bg-orange-100" }
+    { icon: Battery, title: "Voltaje alimentación", value: "5.00", unit: "V", color: "text-violet-500", bgColor: "bg-violet-100" },
+    { icon: Activity, title: "Tiempo activo", value: calculateActivity(lastData.elapsed_time_us), unit: "min", color: "text-orange-500", bgColor: "bg-orange-100" }
   ];
 
   const chartConfigs = [

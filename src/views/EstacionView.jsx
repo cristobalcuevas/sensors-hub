@@ -27,10 +27,10 @@ export const WeatherView = () => {
 
 
   const dashboardCards = [
-    { icon: Thermometer, title: "Temperatura exterior", value: formatValue(latest.tempc, 1), unit: "°C", color: "text-orange-500", bgColor: "bg-orange-100" },
-    { icon: ThermometerSun, title: "Humedad exterior", value: formatValue(latest.humidity, 0), unit: "%", color: "text-sky-500", bgColor: "bg-sky-100" },
+    { icon: Thermometer, title: "Temperatura ambiente", value: formatValue(latest.tempc, 1), unit: "°C", color: "text-orange-500", bgColor: "bg-orange-100" },
+    { icon: ThermometerSun, title: "Humedad ambiente", value: formatValue(latest.humidity, 0), unit: "%", color: "text-sky-500", bgColor: "bg-sky-100" },
     { icon: Gauge, title: "Presión relativa", value: formatValue(latest.baromrelhpa, 0), unit: "hPa", color: "text-violet-500", bgColor: "bg-violet-100" },
-    { icon: CloudRain, title: "Precipitación diarias", value: formatValue(latest.dailyrainmm, 1), unit: "mm", color: "text-blue-500", bgColor: "bg-blue-100" },
+    { icon: CloudRain, title: "Precipitaciones diarias", value: formatValue(latest.dailyrainmm, 1), unit: "mm", color: "text-blue-500", bgColor: "bg-blue-100" },
     { icon: Wind, title: "Velocidad del viento", value: formatValue(latest.windspeedkmh, 1), unit: "km/h", color: "text-green-500", bgColor: "bg-green-100" },
     { icon: Compass, title: "Dirección del viento", value: latest.winddir, unit: "°", color: "text-cyan-500", bgColor: "bg-cyan-100" },
   ]
