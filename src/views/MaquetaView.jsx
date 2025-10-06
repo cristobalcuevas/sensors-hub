@@ -7,6 +7,8 @@ import { ChartCard } from '../components/ChartCard';
 import { CONSTANTS } from '../constants';
 import { Gauge, Waves, Wifi, Battery, Activity, Clock, AlertTriangle } from 'lucide-react';
 
+const PRESSURE_FACTOR = 0.1; // cambia este valor según necesites
+
 const formatTimestamp = (timestamp) => {
   return new Date(Number(timestamp) * 1000).toLocaleString('es-ES', {
     dateStyle: 'long',
@@ -40,7 +42,7 @@ export const FirebaseView = () => {
   }
 
   const dashboardCards = [
-    { icon: Gauge, title: "Presión", value: formatValue(lastData.pressure), unit: "bar", color: "text-sky-500", bgColor: "bg-sky-100" },
+    { icon: Gauge, title: "Presión", value: formatValue(lastData.pressure * PRESSURE_FACTOR), unit: "bar", color: "text-sky-500", bgColor: "bg-sky-100" },
     { icon: Waves, title: "Caudal", value: formatValue(lastData.flow), unit: "L/min", color: "text-green-500", bgColor: "bg-green-100" },
     { icon: Wifi, title: "Señal (RSSI)", value: lastData.rssi, unit: "dBm", color: "text-rose-500", bgColor: "bg-rose-100" },
     { icon: Battery, title: "Voltaje alimentación", value: "5.00", unit: "V", color: "text-violet-500", bgColor: "bg-violet-100" },
@@ -73,7 +75,7 @@ export const FirebaseView = () => {
         <MapCard position={CONSTANTS.MAQUETA.LOCATION}>
           <div className="text-sm">
             <p><strong>Dispositivo:</strong> {lastData.device}</p>
-            <p><strong>Presión:</strong> {formatValue(lastData.pressure)} bar</p>
+            <p><strong>Presión:</strong> {formatValue(lastData.pressure * PRESSURE_FACTOR)} bar</p>
             <p><strong>Caudal:</strong> {formatValue(lastData.flow)} L/min</p>
             <p><strong>Última actualización:</strong> {formatTimestamp(lastData.timestamp)}</p>
           </div>
