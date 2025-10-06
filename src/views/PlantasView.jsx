@@ -40,7 +40,7 @@ export const UbidotsView = () => {
   const [selectedPlantId, setSelectedPlantId] = useState(
     CONSTANTS.UBIDOTS_PLANTS[0]?.id || ''
   );
-  
+
   // Estados para el dropdown personalizado
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -99,10 +99,9 @@ export const UbidotsView = () => {
                 </span>
               </div>
             </div>
-            <ChevronDown 
-              className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${
-                isDropdownOpen ? 'transform rotate-180' : ''
-              }`}
+            <ChevronDown
+              className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'transform rotate-180' : ''
+                }`}
             />
           </button>
 
@@ -115,11 +114,11 @@ export const UbidotsView = () => {
                 {(() => {
                   // Separar plantas y puntos (asumiendo que tienes un campo 'type' o similar)
                   // Si no tienes un campo específico, puedes usar otra lógica como el nombre o ID
-                  const plantas = CONSTANTS.UBIDOTS_PLANTS.filter(item => 
-                    item.type === 'plant' || item.name?.toLowerCase().includes('planta') || 
+                  const plantas = CONSTANTS.UBIDOTS_PLANTS.filter(item =>
+                    item.type === 'plant' || item.name?.toLowerCase().includes('planta') ||
                     !item.name?.toLowerCase().includes('punto')
                   );
-                  const puntos = CONSTANTS.UBIDOTS_PLANTS.filter(item => 
+                  const puntos = CONSTANTS.UBIDOTS_PLANTS.filter(item =>
                     item.type === 'point' || item.name?.toLowerCase().includes('punto')
                   );
 
@@ -138,17 +137,15 @@ export const UbidotsView = () => {
                             <button
                               key={plant.id}
                               onClick={() => handlePlantSelect(plant.id)}
-                              className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors duration-150 ${
-                                selectedPlantId === plant.id ? 'bg-sky-50 border-r-2 border-sky-500' : ''
-                              }`}
+                              className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors duration-150 ${selectedPlantId === plant.id ? 'bg-sky-50 border-r-2 border-sky-500' : ''
+                                }`}
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
                                   <div className="w-3 h-3 rounded-full flex-shrink-0 bg-green-500"></div>
                                   <div className="flex flex-col min-w-0 flex-1">
-                                    <span className={`text-sm font-medium truncate ${
-                                      selectedPlantId === plant.id ? 'text-sky-900' : 'text-slate-900'
-                                    }`}>
+                                    <span className={`text-sm font-medium truncate ${selectedPlantId === plant.id ? 'text-sky-900' : 'text-slate-900'
+                                      }`}>
                                       {plant.name}
                                     </span>
                                     <div className="flex items-center space-x-2 mt-1">
@@ -188,17 +185,15 @@ export const UbidotsView = () => {
                             <button
                               key={punto.id}
                               onClick={() => handlePlantSelect(punto.id)}
-                              className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors duration-150 ${
-                                selectedPlantId === punto.id ? 'bg-sky-50 border-r-2 border-sky-500' : ''
-                              }`}
+                              className={`w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors duration-150 ${selectedPlantId === punto.id ? 'bg-sky-50 border-r-2 border-sky-500' : ''
+                                }`}
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
                                   <div className={"w-3 h-3 rounded-full flex-shrink-0 bg-green-500"}></div>
                                   <div className="flex flex-col min-w-0 flex-1">
-                                    <span className={`text-sm font-medium truncate ${
-                                      selectedPlantId === punto.id ? 'text-sky-900' : 'text-slate-900'
-                                    }`}>
+                                    <span className={`text-sm font-medium truncate ${selectedPlantId === punto.id ? 'text-sky-900' : 'text-slate-900'
+                                      }`}>
                                       {punto.name}
                                     </span>
                                     <div className="flex items-center space-x-2 mt-1">
@@ -270,8 +265,9 @@ export const UbidotsView = () => {
               let value;
               if (config.conversion === 'ma_a_mca') {
                 value = (rawValue - 4) * 15.93;
-              }
-              else {
+              } else if (config.factor) {
+                value = rawValue * config.factor;
+              } else {
                 value = rawValue;
               }
               return (
@@ -318,6 +314,8 @@ export const UbidotsView = () => {
               if (!isNaN(rawValue)) {
                 if (config.conversion === 'ma_a_mca') {
                   value = (rawValue - 4) * 15.93;
+                } else if (config.factor) {
+                  value = rawValue * config.factor;
                 } else {
                   value = rawValue;
                 }

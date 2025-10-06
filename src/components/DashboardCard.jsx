@@ -1,11 +1,18 @@
 import React from 'react';
 
-export const DashboardCard = React.memo(({ icon: Icon, title, value, conversion, unit, color, bgColor }) => {
+export const DashboardCard = React.memo(({
+  icon: Icon,
+  title,
+  value,
+  unit = '',
+  color = 'text-blue-500',
+  bgColor = 'bg-blue-100'
+}) => {
   return (
     <div
-      role="card"
+      role="region"
       aria-label={`Ultimo valor de ${title}: ${value} ${unit}`}
-      className="bg-white shadow-sm rounded-xl p-6 flex items-center space-x-6 transition-all duration-300 hover:scale-105 hover:shadow-md">
+      className="bg-white shadow-sm rounded-xl p-6 flex items-center space-x-6 transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
       <div className={`p-4 rounded-full ${bgColor}`}>
         <Icon className={`h-8 w-8 ${color}`} aria-hidden="true" />
       </div>

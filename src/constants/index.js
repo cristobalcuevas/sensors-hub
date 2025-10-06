@@ -40,7 +40,7 @@ export const CONSTANTS = {
           name: 'Tuberia de entrada',
           token: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_TOKEN_PRESION,
           variables: {
-            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_PRESION, name: 'Presión', unit: 'mca', icon: Gauge, color: 'sky' },
+            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_PRESION, name: 'Presión', unit: 'mca', factor: 10.2, icon: Gauge, color: 'sky' },
             //battery: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_BATERIA, name: 'Bateria', unit: 'V', icon: Battery, color: 'green' },
             //current: { id: import.meta.env.PUBLIC_UBIDOTS_VOLCAN_CORRIENTE, name: 'Corriente', unit: 'mA', icon: Gauge, color: 'amber' },
           }
@@ -81,7 +81,7 @@ export const CONSTANTS = {
           name: 'Tuberia de entrada',
           token: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_TOKEN_PRESION,
           variables: {
-            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_PRESION, name: 'Presión', unit: 'mca', icon: Gauge, color: 'sky' },
+            pressure: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_PRESION, name: 'Presión', unit: 'mca', factor: 5.2, icon: Gauge, color: 'sky' },
             //battery: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_BATERIA, name: 'Bateria', unit: 'V', icon: Battery, color: 'green' },
             //current: { id: import.meta.env.PUBLIC_UBIDOTS_CANDELARIA_CORRIENTE, name: 'Corriente', unit: 'mA', icon: Gauge, color: 'amber' },
           }
