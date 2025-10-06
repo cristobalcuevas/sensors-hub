@@ -146,8 +146,8 @@ export const CONSTANTS = {
 
     },
     {
-      id: 'punto_krauss',
-      name: 'Punto Krauss',
+      id: 'punto_krause',
+      name: 'Punto Krause',
       location: [-39.2965513,-72.0095145],
       sensors: [
         {
