@@ -5,7 +5,7 @@ import { DashboardCard } from '../components/DashboardCard';
 import { MapCard } from '../components/MapCard';
 import { ChartCard } from '../components/ChartCard';
 import { CONSTANTS } from '../constants';
-import { Thermometer, ThermometerSun, Gauge, CloudRain, Wind, Compass, Clock } from 'lucide-react';
+import { Thermometer, ThermometerSun, Gauge, CloudRain, Wind, Compass, Clock, Sun, Zap } from 'lucide-react';
 
 const formatTimestamp = (timestamp) => {
   return new Date(timestamp).toLocaleString('es-ES', {
@@ -30,32 +30,88 @@ export const WeatherView = () => {
     { icon: Thermometer, title: "Temperatura ambiente", value: formatValue(latest.tempc, 1), unit: "°C", color: "text-orange-500", bgColor: "bg-orange-100" },
     { icon: ThermometerSun, title: "Humedad ambiente", value: formatValue(latest.humidity, 0), unit: "%", color: "text-sky-500", bgColor: "bg-sky-100" },
     { icon: Gauge, title: "Presión relativa", value: formatValue(latest.baromrelhpa, 0), unit: "hPa", color: "text-violet-500", bgColor: "bg-violet-100" },
-    { icon: CloudRain, title: "Precipitaciones diarias", value: formatValue(latest.dailyrainmm, 1), unit: "mm", color: "text-blue-500", bgColor: "bg-blue-100" },
+    { icon: CloudRain, title: "Diarias", value: formatValue(latest.dailyrainmm, 0), unit: "mm", color: "text-blue-500", bgColor: "bg-blue-100" },
+    { icon: CloudRain, title: "Semanales", value: formatValue(latest.weeklyrainmm, 0), unit: "mm", color: "text-blue-500", bgColor: "bg-blue-100" },
+    { icon: CloudRain, title: "Mensuales", value: formatValue(latest.monthlyrainmm, 0), unit: "mm", color: "text-blue-500", bgColor: "bg-blue-100" },
+    { icon: CloudRain, title: "Anuales", value: formatValue(latest.yearlyrainmm, 0), unit: "mm", color: "text-blue-500", bgColor: "bg-blue-100" },
+    { icon: CloudRain, title: "Totales", value: formatValue(latest.totalrainmm, 0), unit: "mm", color: "text-blue-500", bgColor: "bg-blue-100" },
     { icon: Wind, title: "Velocidad del viento", value: formatValue(latest.windspeedkmh, 1), unit: "km/h", color: "text-green-500", bgColor: "bg-green-100" },
     { icon: Compass, title: "Dirección del viento", value: latest.winddir, unit: "°", color: "text-cyan-500", bgColor: "bg-cyan-100" },
+    { icon: Sun, title: "Radiación solar", value: formatValue(latest.lux, 0), unit: "lux", color: "text-red-500", bgColor: "bg-red-100" },
+    { icon: Zap, title: "Indice UV", value: latest.uv, unit: "", color: "text-yellow-500", bgColor: "bg-yellow-100" },
+
   ]
 
   const chartConfigs = [
     { dataKey: "tempc", name: "Temperatura exterior", unit: "°C", color: CONSTANTS.COLORS.orange },
     { dataKey: "humidity", name: "Humedad exterior", unit: "%", color: CONSTANTS.COLORS.sky },
     { dataKey: "baromrelhpa", name: "Presión relativa", unit: "hPa", color: CONSTANTS.COLORS.violet },
-    { dataKey: "windspeedkmh", name: "Velocidad del Viento", unit: "km/h", color: CONSTANTS.COLORS.green },
-    { dataKey: "dailyrainmm", name: "Precipitación diarias", unit: "mm", color: CONSTANTS.COLORS.blue },
+    { dataKey: "windspeedkmh", name: "Velocidad del viento", unit: "km/h", color: CONSTANTS.COLORS.green },
+    { dataKey: "lux", name: "Radiación solar", unit: "lux", color: CONSTANTS.COLORS.blue },
   ];
 
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
       {/* Header */}
-      <h2 className="text-3xl font-bold text-slate-800 mb-8">Estación meteorológica </h2>
+      <h2 className="text-3xl font-bold text-slate-800 mb-8">Estación meteorológica</h2>
       {/* Tarjetas */}
+      <h3 class="text-2xl font-semibold text-slate-700 mb-4 border-b-2 border-sky-200 pb-2">Clima</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-        {dashboardCards.map(card =>
-          <DashboardCard
-            key={card.title}
-            {...card}
-          />
-        )}
+
+        {dashboardCards
+          .filter(card =>
+            ["Temperatura ambiente", "Humedad ambiente", "Presión relativa"].includes(card.title)
+          )
+          .map(card =>
+            <DashboardCard
+              key={card.title}
+              {...card}
+            />
+          )}
+
+      </div>
+      <h3 class="text-2xl font-semibold text-slate-700 mb-4 border-b-2 border-sky-200 pb-2">Lluvias
+        <span class="text-sm text-right"> - Ultima vez el {formatTimestamp(latest.lastRain)}</span>
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+        {dashboardCards
+          .filter(card =>
+            ["Diarias", "Semanales", "Mensuales", "Anuales", "Totales"].includes(card.title)
+          )
+          .map(card =>
+            <DashboardCard
+              key={card.title}
+              {...card}
+            />
+          )}
+      </div>
+      <h3 class="text-2xl font-semibold text-slate-700 mb-4 border-b-2 border-sky-200 pb-2">Viento</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+        {dashboardCards
+          .filter(card =>
+            ["Velocidad del viento", "Dirección del viento"].includes(card.title)
+          )
+          .map(card =>
+            <DashboardCard
+              key={card.title}
+              {...card}
+            />
+          )}
+      </div>
+      <h3 class="text-2xl font-semibold text-slate-700 mb-4 border-b-2 border-sky-200 pb-2">Solar</h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+        {dashboardCards
+          .filter(card =>
+            ["Radiación solar", "Indice UV"].includes(card.title)
+          )
+          .map(card =>
+            <DashboardCard
+              key={card.title}
+              {...card}
+            />
+          )}
       </div>
 
       {/* Mapa */}

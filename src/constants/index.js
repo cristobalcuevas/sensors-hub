@@ -116,7 +116,7 @@ export const CONSTANTS = {
       sensors: [
         {
           id: 'punto_candelaria_presion',
-          name: 'in0',
+          name: 'Tuberia',
           token: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CANDELARIA_TOKEN_PRESION,
           variables: {
             pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CANDELARIA_PRESION, name: 'Presión', conversion: 'ma_a_mca', unit: 'mca', icon: Gauge, color: 'sky' },
@@ -132,7 +132,7 @@ export const CONSTANTS = {
       sensors: [
         {
           id: 'punto_candelaria_presion',
-          name: 'in0',
+          name: 'Tuberia',
           token: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CURICHE_TOKEN_PRESION,
           variables: {
             pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_CURICHE_PRESION, name: 'Presión', conversion: 'ma_a_mca', unit: 'mca', icon: Gauge, color: 'sky' },
@@ -148,7 +148,7 @@ export const CONSTANTS = {
       sensors: [
         {
           id: 'punto_candelaria_presion',
-          name: 'in0',
+          name: 'Tuberia',
           token: import.meta.env.PUBLIC_UBIDOTS_PUNTO_KRAUSS_TOKEN_PRESION,
           variables: {
             pressure: { id: import.meta.env.PUBLIC_UBIDOTS_PUNTO_KRAUSS_PRESION, name: 'Presión', conversion: 'ma_a_mca', unit: 'mca', icon: Gauge, color: 'sky' },

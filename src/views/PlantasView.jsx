@@ -87,7 +87,7 @@ export const UbidotsView = () => {
                   {selectedPlant?.name || 'Seleccionar planta'}
                 </span>
                 <span className="text-xs text-slate-500">
-                  {CONSTANTS.UBIDOTS_PLANTS.length} plantas disponibles
+                  {CONSTANTS.UBIDOTS_PLANTS.length} puntos disponibles
                 </span>
               </div>
             </div>
@@ -214,7 +214,7 @@ export const UbidotsView = () => {
               {/* Footer del dropdown */}
               <div className="px-4 py-2 bg-slate-50 border-t border-slate-200">
                 <p className="text-xs text-slate-500 text-center">
-                  Los datos se actualizan en tiempo real
+                  Los datos se actualizan cada 3 minutos
                 </p>
               </div>
             </div>

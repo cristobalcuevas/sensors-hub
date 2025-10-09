@@ -12,7 +12,8 @@ const convertUnits = {
   fahrenheitToCelsius: (f) => (f - 32) * 5 / 9,
   inchesToMm: (inches) => inches * 25.4,
   inHgToHPa: (inHg) => inHg * 33.8639,
-  mphToKmh: (mph) => mph * 1.60934
+  mphToKmh: (mph) => mph * 1.60934,
+  wm2ToLux: (wm2) => wm2 * 126.7, // Aproximación
 };
 
 const transformAmbientData = (records, locale) => {
@@ -24,6 +25,11 @@ const transformAmbientData = (records, locale) => {
     baromrelhpa: convertUnits.inHgToHPa(record.baromrelin),
     windspeedkmh: convertUnits.mphToKmh(record.windspeedmph),
     dailyrainmm: convertUnits.inchesToMm(record.dailyrainin),
+    weeklyrainmm: convertUnits.inchesToMm(record.weeklyrainin),
+    monthlyrainmm: convertUnits.inchesToMm(record.monthlyrainin),
+    yearlyrainmm: convertUnits.inchesToMm(record.yearlyrainin),
+    totalrainmm: convertUnits.inchesToMm(record.totalrainin),
+    lux: convertUnits.wm2ToLux(record.solarradiation),
     timestamp: new Date(record.dateutc).getTime(),
     time: new Date(record.dateutc).toLocaleTimeString(locale, {
       hour: '2-digit',
