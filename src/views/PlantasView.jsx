@@ -6,7 +6,7 @@ import { DashboardCard } from '../components/DashboardCard';
 import { MapCard } from '../components/MapCard';
 import { ChartCard } from '../components/ChartCard';
 import { CONSTANTS } from '../constants';
-import { Clock, ChevronDown, Check, Building2 } from 'lucide-react';
+import { Clock, ChevronDown, Check, Building2, Droplets } from 'lucide-react';
 
 const formatTimestamp = (timestamp) => {
   return new Date(Number(timestamp)).toLocaleString('es-ES', {
@@ -17,24 +17,6 @@ const formatTimestamp = (timestamp) => {
 
 const formatValue = (value, decimals = 2) =>
   typeof value === 'number' && !isNaN(value) ? value.toFixed(decimals) : 'N/A';
-
-const formatLastDataTime = (timestamp) => {
-  if (!timestamp) return null;
-
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diffMs = now - date;
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffHours < 1) {
-    return "Hace menos de 1 hora";
-  } else if (diffHours < 24) {
-    return `Hace ${diffHours} horas`;
-  } else {
-    return `Hace ${diffDays} días`;
-  }
-};
 
 export const UbidotsView = () => {
   const [selectedPlantId, setSelectedPlantId] = useState(
@@ -49,7 +31,17 @@ export const UbidotsView = () => {
     return CONSTANTS.UBIDOTS_PLANTS.find(p => p.id === selectedPlantId);
   }, [selectedPlantId]);
 
-  const { data, loading, error, lastDataTimestamp, isDataStale } = useUbidotsData(selectedPlant);
+  // Configurar las variables de caudal para el hook
+  const hookOptions = useMemo(() => ({
+    flowRateVariables: ['litres_in', 'litres_out'],
+    refreshInterval: 180000,
+    historyHours: 24
+  }), []);
+
+  const { data, loading, error, lastDataTimestamp, isDataStale } = useUbidotsData(
+    selectedPlant,
+    hookOptions
+  );
 
   // Cerrar dropdown al hacer click fuera
   useEffect(() => {
@@ -112,8 +104,6 @@ export const UbidotsView = () => {
               {/* Lista organizada por tipo */}
               <div className="py-1 max-h-64 overflow-y-auto">
                 {(() => {
-                  // Separar plantas y puntos (asumiendo que tienes un campo 'type' o similar)
-                  // Si no tienes un campo específico, puedes usar otra lógica como el nombre o ID
                   const plantas = CONSTANTS.UBIDOTS_PLANTS.filter(item =>
                     item.type === 'plant' || item.name?.toLowerCase().includes('planta') ||
                     !item.name?.toLowerCase().includes('punto')
@@ -133,7 +123,7 @@ export const UbidotsView = () => {
                               Plantas ({plantas.length})
                             </h4>
                           </div>
-                          {plantas.map((plant, index) => (
+                          {plantas.map((plant) => (
                             <button
                               key={plant.id}
                               onClick={() => handlePlantSelect(plant.id)}
@@ -181,7 +171,7 @@ export const UbidotsView = () => {
                               Puntos de Medición ({puntos.length})
                             </h4>
                           </div>
-                          {puntos.map((punto, index) => (
+                          {puntos.map((punto) => (
                             <button
                               key={punto.id}
                               onClick={() => handlePlantSelect(punto.id)}
@@ -232,27 +222,6 @@ export const UbidotsView = () => {
         </div>
       </div>
 
-      {/* Mensaje de alerta */}
-      <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-md">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-amber-800">
-              Alerta
-            </h3>
-            <div className="mt-2 text-sm text-red-700">
-              <p>
-                Anomalia entre el punto 1 y 2 debido a una posible fuga en la tubería.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Tarjetas de sensores */}
       {selectedPlant.sensors?.map(sensor => (
         <div key={sensor.id} className="mb-10">
@@ -261,22 +230,33 @@ export const UbidotsView = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {Object.entries(sensor.variables || {}).map(([key, config]) => {
-              let rawValue = data.latestValues[key];
-              let value;
-              if (config.conversion === 'ma_a_mca') {
-                value = (rawValue - 4) * 15.93;
-              } else if (config.factor) {
-                value = rawValue * config.factor;
+              const isFlowVariable = key === 'litres_in' || key === 'litres_out';
+              let value, displayUnit, displayTitle;
+              if (isFlowVariable && data.flowRates?.[key]) {
+                value = data.flowRates[key].value;
+                displayUnit = 'L/min';
+                displayTitle = key === 'litres_in' ? 'Caudal de Entrada' : 'Caudal de Salida';
               } else {
-                value = rawValue;
+                // Mostrar valor normal
+                let rawValue = data.latestValues[key];
+                if (config.conversion === 'ma_a_mca') {
+                  value = (rawValue - 4) * 15.93;
+                } else if (config.factor) {
+                  value = rawValue * config.factor;
+                } else {
+                  value = rawValue;
+                }
+                displayUnit = config.unit;
+                displayTitle = config.name;
               }
+
               return (
                 <DashboardCard
                   key={key}
                   icon={config.icon}
-                  title={config.name}
+                  title={displayTitle}
                   value={formatValue(value)}
-                  unit={config.unit}
+                  unit={displayUnit}
                   color={`text-${config.color}-500`}
                   bgColor={`bg-${config.color}-100`}
                   isStale={isDataStale}
@@ -294,7 +274,8 @@ export const UbidotsView = () => {
             <div className="text-sm">
               <p><strong>Planta: </strong>{selectedPlant.name}</p>
               <p><strong>Presión: </strong>{formatValue(data.latestValues.pressure)} bar</p>
-              <p><strong>Caudal: </strong>{formatValue(data.latestValues.flow)} L/min</p>
+              <p><strong>Caudal Entrada: </strong>{data.flowRates?.litres_in ? formatValue(data.flowRates.litres_in.value) : 'N/A'} L/min</p>
+              <p><strong>Caudal Salida: </strong>{data.flowRates?.litres_out ? formatValue(data.flowRates.litres_out.value) : 'N/A'} L/min</p>
               <p><strong>Última actualización: </strong> {lastDataTimestamp ? new Date(lastDataTimestamp).toLocaleString('es-ES') : 'Desconocida'}</p>
             </div>
           </MapCard>
@@ -304,9 +285,9 @@ export const UbidotsView = () => {
       {/* Gráficas */}
       <h3 className="text-2xl font-semibold text-slate-700 mb-4 mt-8 border-b-2 border-slate-300 pb-2">Gráficas históricas (Últimas 24h disponibles)</h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Gráficas de variables normales */}
         {selectedPlant.sensors?.flatMap(sensor =>
           Object.entries(sensor.variables || {}).map(([key, config]) => {
-            // Transformamos history según el tipo de conversión
             const chartData = data.history.map(entry => {
               let rawValue = parseFloat(entry[key]);
               let value;
@@ -320,7 +301,7 @@ export const UbidotsView = () => {
                   value = rawValue;
                 }
               } else {
-                value = null; // para que el gráfico pinte hueco
+                value = null;
               }
 
               return {

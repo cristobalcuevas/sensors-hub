@@ -2,6 +2,7 @@
 import '../styles/global.css'  
 import { Sidebar } from '../components/Sidebar';
 import { MobileHeader } from '../components/MobileHeader';
+import  SpeedInsights  from "@vercel/speed-insights/astro"
 ---
 <html lang="es">
 <head>
@@ -21,6 +22,7 @@ import { MobileHeader } from '../components/MobileHeader';
         <Sidebar client:load />
         <div class="flex flex-col flex-1 w-full z-10">
             <MobileHeader client:load />
+            <SpeedInsights/>
             <main class="flex-1 overflow-y-auto">
                 <slot />
             </main>

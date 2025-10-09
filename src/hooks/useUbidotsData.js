@@ -6,14 +6,15 @@ const DEFAULT_CONFIG = {
   historyHours: 24,
   pageSize: 1,
   baseUrl: 'https://industrial.api.ubidots.com/api/v1.6',
-  maxHistoryDays: 30 // Máximo de días hacia atrás para buscar datos
+  maxHistoryDays: 30, // Máximo de días hacia atrás para buscar datos
+  flowRateVariables: [] // Variables que representan litros acumulados para calcular caudal
 };
 
 export const useUbidotsData = (plantConfig, options = {}) => {
-  const [data, setData] = useState({ latestValues: {}, history: [] });
+  const [data, setData] = useState({ latestValues: {}, history: [], flowRates: {} });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [lastDataTimestamp, setLastDataTimestamp] = useState(null); // Nuevo estado
+  const [lastDataTimestamp, setLastDataTimestamp] = useState(null);
 
   const config = { ...DEFAULT_CONFIG, ...options };
 
@@ -24,7 +25,89 @@ export const useUbidotsData = (plantConfig, options = {}) => {
     return headers;
   }, []);
 
-  // Función para obtener los últimos valores (busca más datos si es necesario)
+  // Función para calcular el caudal en L/min
+  const calculateFlowRate = useCallback((currentValue, previousValue, currentTime, previousTime) => {
+    if (currentValue == null || previousValue == null || currentTime == null || previousTime == null) {
+      return null;
+    }
+
+    const volumeDiff = currentValue - previousValue;
+    const timeDiffMs = currentTime - previousTime;
+    const timeDiffMin = timeDiffMs / (1000 * 60); // Convertir a minutos
+
+    if (timeDiffMin <= 0) return null;
+
+    // Caudal en L/min
+    const flowRate = volumeDiff / timeDiffMin;
+    
+    return flowRate >= 0 ? flowRate : 0; // Evitar caudales negativos
+  }, []);
+
+  // Función para calcular caudales de las últimas lecturas
+  const calculateLatestFlowRates = useCallback(async (sensors, flowRateVariables) => {
+    if (!flowRateVariables || flowRateVariables.length === 0) {
+      return {};
+    }
+
+    const flowRates = {};
+
+    for (const variableKey of flowRateVariables) {
+      // Buscar el sensor y variable correspondiente
+      let targetSensor = null;
+      let targetVariable = null;
+
+      for (const sensor of sensors) {
+        if (sensor.variables[variableKey]) {
+          targetSensor = sensor;
+          targetVariable = sensor.variables[variableKey];
+          break;
+        }
+      }
+
+      if (!targetSensor || !targetVariable) continue;
+
+      try {
+        // Obtener los últimos 2 valores válidos
+        const response = await fetch(
+          `${config.baseUrl}/variables/${targetVariable.id}/values/?page_size=20`,
+          { headers: createHeaders(targetSensor.token) }
+        );
+        const result = await response.json();
+
+        if (result?.results && result.results.length >= 2) {
+          // Filtrar valores válidos
+          const validValues = result.results.filter(item => item.value != null);
+
+          if (validValues.length >= 2) {
+            const latest = validValues[0];
+            const previous = validValues[1];
+
+            const flowRate = calculateFlowRate(
+              latest.value,
+              previous.value,
+              latest.timestamp,
+              previous.timestamp
+            );
+
+            flowRates[variableKey] = {
+              value: flowRate,
+              unit: 'L/min',
+              timestamp: latest.timestamp,
+              volumeDiff: latest.value - previous.value,
+              timeDiff: (latest.timestamp - previous.timestamp) / 60000 // en minutos
+            };
+          }
+        }
+      } catch (err) {
+        console.warn(`Error calculando caudal para ${variableKey}:`, err);
+        flowRates[variableKey] = null;
+      }
+    }
+
+    return flowRates;
+  }, [config.baseUrl, createHeaders, calculateFlowRate]);
+
+  // Función para obtener los últimos valores
   const fetchLatestValues = useCallback(async (sensors) => {
     const promises = [];
     const variableKeys = [];
@@ -32,7 +115,7 @@ export const useUbidotsData = (plantConfig, options = {}) => {
     sensors.forEach(sensor => {
       Object.entries(sensor.variables).forEach(([key, variable]) => {
         promises.push(
-          fetch(`${config.baseUrl}/variables/${variable.id}/values/?page_size=10`, { // Aumentamos page_size
+          fetch(`${config.baseUrl}/variables/${variable.id}/values/?page_size=10`, {
             headers: createHeaders(sensor.token)
           }).then(res => res.json())
         );
@@ -47,7 +130,6 @@ export const useUbidotsData = (plantConfig, options = {}) => {
     results.forEach((result, index) => {
       const key = variableKeys[index];
       if (result?.results && result.results.length > 0) {
-        // Buscar el primer valor válido
         const validResult = result.results.find(item => item.value != null);
         if (validResult) {
           latestValues[key] = validResult.value;
@@ -70,7 +152,6 @@ export const useUbidotsData = (plantConfig, options = {}) => {
   const findDataRange = useCallback(async (sensors) => {
     let latestTimestamp = null;
     
-    // Primero intentamos encontrar el timestamp más reciente con datos
     for (const sensor of sensors) {
       const variableIds = Object.values(sensor.variables).map(v => v.id);
       
@@ -95,7 +176,6 @@ export const useUbidotsData = (plantConfig, options = {}) => {
     }
 
     if (!latestTimestamp) {
-      // Si no encontramos datos, buscar hacia atrás
       const maxDaysBack = config.maxHistoryDays;
       for (let daysBack = 1; daysBack <= maxDaysBack; daysBack++) {
         const end = Date.now() - (daysBack * 24 * 60 * 60 * 1000);
@@ -107,7 +187,7 @@ export const useUbidotsData = (plantConfig, options = {}) => {
 
           try {
             const body = {
-              variables: variableIds.slice(0, 1), // Solo el primero para verificar
+              variables: variableIds.slice(0, 1),
               columns: ["timestamp"],
               join_dataframes: false,
               start,
@@ -123,7 +203,6 @@ export const useUbidotsData = (plantConfig, options = {}) => {
             const result = await response.json();
             
             if (result?.results && result.results[0] && result.results[0].length > 0) {
-              // Encontramos datos, usar el final de este período como referencia
               latestTimestamp = end;
               break;
             }
@@ -136,10 +215,10 @@ export const useUbidotsData = (plantConfig, options = {}) => {
       }
     }
 
-    return latestTimestamp || Date.now(); // Fallback al tiempo actual
+    return latestTimestamp || Date.now();
   }, [config.baseUrl, config.maxHistoryDays, createHeaders]);
 
-  // Función para obtener el historial basado en el último dato disponible
+  // Función para obtener el historial
   const fetchHistory = useCallback(async (sensors, referenceTimestamp = null) => {
     let endTime = referenceTimestamp;
     
@@ -174,7 +253,7 @@ export const useUbidotsData = (plantConfig, options = {}) => {
     return processHistoryData(results, sensors);
   }, [config.baseUrl, config.historyHours, createHeaders, findDataRange]);
 
-  // Función para procesar datos del historial
+  // Función para procesar datos del historial y calcular caudales históricos
   const processHistoryData = useCallback((results, sensors) => {
     const unifiedHistory = {};
 
@@ -207,8 +286,33 @@ export const useUbidotsData = (plantConfig, options = {}) => {
       });
     });
 
-    return Object.values(unifiedHistory).sort((a, b) => a.timestamp - b.timestamp);
-  }, []);
+    const sortedHistory = Object.values(unifiedHistory).sort((a, b) => a.timestamp - b.timestamp);
+
+    // Calcular caudales históricos para las variables especificadas
+    if (config.flowRateVariables && config.flowRateVariables.length > 0) {
+      for (let i = 1; i < sortedHistory.length; i++) {
+        config.flowRateVariables.forEach(variableKey => {
+          const current = sortedHistory[i];
+          const previous = sortedHistory[i - 1];
+
+          if (current[variableKey] != null && previous[variableKey] != null) {
+            const flowRate = calculateFlowRate(
+              current[variableKey],
+              previous[variableKey],
+              current.timestamp,
+              previous.timestamp
+            );
+
+            if (flowRate != null) {
+              current[`${variableKey}_caudal`] = flowRate;
+            }
+          }
+        });
+      }
+    }
+
+    return sortedHistory;
+  }, [config.flowRateVariables, calculateFlowRate]);
 
   // Función principal para obtener todos los datos
   const fetchData = useCallback(async () => {
@@ -222,18 +326,19 @@ export const useUbidotsData = (plantConfig, options = {}) => {
     setError(null);
 
     try {
-      // Primero obtenemos los últimos valores y el timestamp más reciente
+      // Obtener los últimos valores y el timestamp más reciente
       const { latestValues, mostRecentTimestamp } = await fetchLatestValues(plantConfig.sensors);
       
-      // Actualizamos el estado del último timestamp
+      // Calcular caudales actuales
+      const flowRates = await calculateLatestFlowRates(plantConfig.sensors, config.flowRateVariables);
+      
+      // Actualizar el estado del último timestamp
       setLastDataTimestamp(mostRecentTimestamp);
       
-      // Obtenemos el historial basado en el último dato disponible
+      // Obtener el historial
       const history = await fetchHistory(plantConfig.sensors, mostRecentTimestamp);
 
-      setData({ latestValues, history });
-
-      
+      setData({ latestValues, history, flowRates });
     } catch (err) {
       const errorMessage = `Error al obtener datos de Ubidots: ${err.message}`;
       setError(errorMessage);
@@ -241,12 +346,12 @@ export const useUbidotsData = (plantConfig, options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [plantConfig, fetchLatestValues, fetchHistory]);
+  }, [plantConfig, fetchLatestValues, calculateLatestFlowRates, fetchHistory, config.flowRateVariables]);
 
   // Effect para manejar la carga inicial y el polling
   useEffect(() => {
     if (!plantConfig) {
-      setData({ latestValues: {}, history: [] });
+      setData({ latestValues: {}, history: [], flowRates: {} });
       setLoading(false);
       return;
     }
@@ -263,7 +368,7 @@ export const useUbidotsData = (plantConfig, options = {}) => {
     data,
     loading,
     error,
-    lastDataTimestamp, // Exponemos el timestamp del último dato
+    lastDataTimestamp,
     isDataStale: lastDataTimestamp ? Date.now() - lastDataTimestamp > 24 * 60 * 60 * 1000 : false
   };
 };
