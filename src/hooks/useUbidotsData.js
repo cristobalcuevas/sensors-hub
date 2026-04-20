@@ -4,7 +4,7 @@ const DEFAULT_CONFIG = {
   refreshInterval: 180000,
   historyHours: 24,
   baseUrl: 'https://industrial.api.ubidots.com/api/v1.6',
-  maxHistoryDays: 90,
+  maxHistoryDays: 120,
   flowRateVariables: [],
 };
 
